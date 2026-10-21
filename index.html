@@ -258,7 +258,7 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
     <div class="brand">
       <small>Rusty Rabbit Cafe · Kuningan</small>
       <h1>Corporate Event Bookings</h1>
-      <div class="mode" id="mode">Tersinkron untuk seluruh tim · versi 21 Okt · menu pre-order</div>
+      <div class="mode" id="mode"></div>
     </div>
     <div class="userbar">
       <span class="me"><span id="me-name"></span><span class="role" id="me-role"></span></span>
@@ -935,6 +935,7 @@ $("#list").addEventListener("change",async e=>{
   if(error){toast("Gagal mengubah status.");render();return}
   toast(`Status: ${STATUS[s.value].label}`);loadBookings();
 });
+$("#mode").textContent=longDate(today());
 boot();
 })();
 </script>
