@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rusty Rabbit Corporate Events</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+[hidden]{display:none!important}
+body{margin:0}
+img{max-width:100%}
+
+/* Layout: sales ledger — summary strip, filter bar, dated booking rows; edit in a side sheet, BEO in a modal */
+:root{
+  --bg:#F2F3F0; --surface:#FFFFFF; --sunken:#E9EBE6; --ink:#1D201E; --muted:#5D645F; --line:#D9DCD6;
+  --accent:#B0441A; --accent-ink:#FFFFFF; --accent-soft:#F6E3DA;
+  --early:#3F6589; --early-soft:#E1EAF3; --nego:#9A6410; --nego-soft:#F7ECD6; --conf:#2B7448; --conf-soft:#DDEFE3;
+  --warn:#A3361F;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131614; --surface:#1B1F1C; --sunken:#232825; --ink:#ECEEEA; --muted:#9AA39D; --line:#2F3531;
+  --accent:#E2733F; --accent-ink:#1B0D06; --accent-soft:#3A2419;
+  --early:#8DB3D8; --early-soft:#1D2A37; --nego:#E2B25A; --nego-soft:#33291A; --conf:#7DCB98; --conf-soft:#1A3022;
+  --warn:#EF8A70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131614; --surface:#1B1F1C; --sunken:#232825; --ink:#ECEEEA; --muted:#9AA39D; --line:#2F3531;
+  --accent:#E2733F; --accent-ink:#1B0D06; --accent-soft:#3A2419;
+  --early:#8DB3D8; --early-soft:#1D2A37; --nego:#E2B25A; --nego-soft:#33291A; --conf:#7DCB98; --conf-soft:#1A3022;
+  --warn:#EF8A70; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+
+/* header */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.brand h1{font-size:30px;font-weight:800;font-stretch:78%;letter-spacing:-.01em;line-height:1.05}
+.mode{font-size:12px;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--line)}
+.btn.danger{color:var(--warn)}
+.btn.sm{padding:5px 10px;font-size:13px}
+
+/* summary */
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.stat{padding:14px 16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat:last-child{border-right:0}
+.stat b{font-family:var(--f-display);font-size:28px;font-weight:700;font-stretch:85%;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:12px;color:var(--muted)}
+.stat .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-bottom:1px solid var(--line)}.stat:nth-child(2n){border-right:0}.stat:last-child{grid-column:1/-1;border-bottom:0}}
+
+/* toolbar */
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search{flex:1 1 220px;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+select.period{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px}
+
+/* list */
+.list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.row{display:grid;grid-template-columns:64px minmax(0,1.6fr) 80px minmax(0,1fr) 150px auto;gap:16px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row.past{opacity:.62}
+.date{text-align:center;border-right:1px solid var(--line);padding-right:12px}
+.date b{display:block;font-family:var(--f-display);font-size:26px;font-weight:700;font-stretch:80%;line-height:1;font-variant-numeric:tabular-nums}
+.date span{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.who{min-width:0}
+.who h3{font-size:16px;font-weight:700;font-stretch:90%;overflow-wrap:anywhere}
+.who p{margin:2px 0 0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.pax b{font-family:var(--f-display);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.pax span{font-size:12px;color:var(--muted);margin-left:2px}
+.menu{min-width:0;font-size:13px}
+.menu b{display:block;font-weight:600}
+.menu span{color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.pill{font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px 3px 8px;border:0;cursor:pointer;appearance:none;-webkit-appearance:none}
+.pill.early{background:var(--early-soft);color:var(--early)}
+.pill.negotiation{background:var(--nego-soft);color:var(--nego)}
+.pill.confirmed{background:var(--conf-soft);color:var(--conf)}
+.dp{font-size:12px;color:var(--muted)}
+.dp.due{color:var(--warn);font-weight:600}
+.dp.ok{color:var(--conf)}
+.acts{display:flex;gap:6px;justify-content:flex-end}
+@media (max-width:860px){
+  .row{grid-template-columns:56px minmax(0,1fr) auto;grid-template-areas:"d w p" "d m m" "d s s" "a a a";row-gap:8px}
+  .date{grid-area:d;align-self:start}.who{grid-area:w}.pax{grid-area:p;text-align:right}.menu{grid-area:m}.st{grid-area:s;flex-direction:row;align-items:center;flex-wrap:wrap}.acts{grid-area:a;justify-content:flex-start}
+}
+.empty{padding:48px 24px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:12px}
+.empty h3{color:var(--ink);font-size:20px}
+.banner{font-size:13px;padding:10px 14px;border-radius:8px;background:var(--accent-soft);color:var(--ink)}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgb(0 0 0 / .38);z-index:20}
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--bg);z-index:21;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgb(0 0 0 / .18);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.sheet header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--surface)}
+.sheet header h2{font-size:20px;font-weight:700;font-stretch:85%}
+.sheet .body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.sheet footer{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:12px 20px;border-top:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.sec{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:14px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.sec-h h3{font-size:15px;font-weight:700;font-stretch:88%;letter-spacing:.01em}
+.sec-h span{font-size:12px;color:var(--muted)}
+.grid2,.grid3{display:grid;gap:12px 14px;align-items:end}
+.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.span2{grid-column:span 2}
+@media (max-width:560px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}.span2{grid-column:auto}}
+label.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lbl{font-size:12px;color:var(--muted);font-weight:500;line-height:1.2}
+.req{color:var(--accent);margin-left:2px}
+.inp,label.f input,label.f textarea{border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:0 11px;height:40px;font-size:14px;width:100%;min-width:0}
+label.f textarea{height:auto;min-height:84px;padding:9px 11px;resize:vertical;line-height:1.45}
+.inp:focus,label.f input:focus,label.f textarea:focus{outline:none;border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 3px var(--accent-soft)}
+.field-h{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:6px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.seg label{display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;min-height:40px;padding:6px 8px;font-size:13px;font-weight:500;border-right:1px solid var(--line);line-height:1.2}
+.seg label:last-child{border-right:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--ink);color:var(--bg)}
+.seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:-2px}
+.sub{border:1px dashed var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:14px;background:var(--bg)}
+.sub .inp,.sub label.f input{background:var(--surface)}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer;min-height:40px}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.items{display:flex;flex-direction:column;gap:8px}
+.item,.itemhead{display:grid;grid-template-columns:minmax(0,1fr) 80px minmax(0,.8fr) 36px;gap:8px;align-items:center}
+.item .x{border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;height:40px;border-radius:7px}
+.item .x:hover{color:var(--warn);border-color:var(--line)}
+.itemhead{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+@media (max-width:560px){.item,.itemhead{grid-template-columns:minmax(0,1fr) 64px 36px}.item .note,.itemhead .note{display:none}}
+.upload{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.proof{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px;margin-bottom:8px}
+.proof:empty{display:none}
+.proof img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.hint{font-size:12px;color:var(--muted);margin:0}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
+
+/* BEO modal */
+.modal{position:fixed;z-index:21;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,calc(100% - 24px));max-height:calc(100% - 40px);background:var(--surface);border-radius:12px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgb(0 0 0 / .3);overflow:hidden}
+.modal header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.modal header h2{font-size:18px;font-weight:700;font-stretch:85%}
+.beo{flex:1;overflow:auto;margin:0;padding:18px;background:var(--sunken);font-family:var(--f-mono);font-size:12.5px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;user-select:text}
+.modal footer{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:12px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:13px;z-index:40}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:slide .2s ease-out}@keyframes slide{from{transform:translateX(24px);opacity:.6}}}
+
+/* auth & users */
+.auth{min-height:100vh;display:grid;place-items:center;padding-block:32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.auth-card{width:min(400px,100%);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 10px 40px rgb(0 0 0 / .06)}
+.auth-card .brand h1{font-size:26px}
+.auth-card form{display:flex;flex-direction:column;gap:14px}
+.auth-card .btn.primary{justify-content:center;height:42px}
+.err{font-size:13px;color:var(--warn);margin:0}
+.ok{font-size:13px;color:var(--conf);margin:0}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font-size:13px;text-decoration:underline;text-underline-offset:2px}
+.userbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.me{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.role{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--sunken);color:var(--ink)}
+.role.master_admin{background:var(--accent-soft);color:var(--accent)}
+label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor:not-allowed}
+.seg.locked{pointer-events:none;opacity:.7}
+.urow{display:grid;grid-template-columns:minmax(0,1fr) 130px auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.urow:last-child{border-bottom:0}
+.urow .who p{word-break:break-all}
+.urow select{height:36px;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:0 8px;width:100%}
+.urow.off .who{opacity:.5}
+@media (max-width:560px){.urow{grid-template-columns:minmax(0,1fr) auto}.urow select{grid-column:1/-1;grid-row:2}}
+.roles-help{font-size:12px;color:var(--muted);display:grid;gap:4px;margin:0;padding-left:18px}
+
+</style>
+</head>
+<body>
+<!-- ============ LOGIN ============ -->
+<div class="auth" id="v-login">
+  <div class="auth-card">
+    <div class="brand">
+      <small>Rusty Rabbit Cafe · Kuningan</small>
+      <h1>Corporate Event Bookings</h1>
+    </div>
+
+    <p class="err" id="net-msg" hidden></p>
+    <form id="login-form" autocomplete="on" onsubmit="return false">
+      <label class="f"><span class="lbl">Email</span><input id="l-email" type="email" required autocomplete="username"></label>
+      <label class="f"><span class="lbl">Password</span><input id="l-pass" type="password" required autocomplete="current-password"></label>
+      <p class="err" id="l-err" hidden></p>
+      <button class="btn primary" type="submit" id="l-btn">Masuk</button>
+    </form>
+
+    <form id="setup-form" hidden autocomplete="off" onsubmit="return false">
+      <p class="hint" style="font-size:13px">Belum ada Master Admin. Buat akun Master Admin pertama.</p>
+      <label class="f"><span class="lbl">Email Master Admin</span><input id="s-email" type="email" required value="steven.jong@gmail.com"></label>
+      <label class="f"><span class="lbl">Password (min. 6 karakter)</span><input id="s-pass" type="password" required minlength="6" autocomplete="new-password"></label>
+      <label class="f"><span class="lbl">Ulangi password</span><input id="s-pass2" type="password" required minlength="6" autocomplete="new-password"></label>
+      <p class="err" id="s-err" hidden></p>
+      <p class="ok" id="s-ok" hidden></p>
+      <button class="btn primary" type="submit" id="s-btn">Buat akun Master Admin</button>
+      <button class="linkbtn" type="button" id="to-login">Kembali ke login</button>
+    </form>
+
+    <button class="linkbtn" type="button" id="to-setup" hidden>Setup akun Master Admin</button>
+  </div>
+</div>
+
+<!-- ============ NO ACCESS ============ -->
+<div class="auth" id="v-pending" hidden>
+  <div class="auth-card">
+    <div class="brand"><small>Rusty Rabbit Cafe</small><h1>Belum ada akses</h1></div>
+    <p style="margin:0">Akun <b id="p-email"></b> belum diberi peran atau sedang dinonaktifkan. Hubungi Master Admin.</p>
+    <button class="btn" type="button" data-logout>Keluar</button>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="wrap" id="v-app" hidden>
+  <div class="top">
+    <div class="brand">
+      <small>Rusty Rabbit Cafe · Kuningan</small>
+      <h1>Corporate Event Bookings</h1>
+      <div class="mode" id="mode">Tersinkron untuk seluruh tim</div>
+    </div>
+    <div class="userbar">
+      <span class="me"><span id="me-name"></span><span class="role" id="me-role"></span></span>
+      <button class="btn" id="btn-users" type="button" hidden>Kelola akses</button>
+      <button class="btn primary" id="btn-new" type="button" hidden>+ Booking baru</button>
+      <button class="btn ghost" type="button" data-logout>Keluar</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="bar">
+    <input class="search" id="q" type="search" placeholder="Cari perusahaan, customer, PIC, telp…" aria-label="Cari booking">
+    <div class="chips" id="chips" role="group" aria-label="Filter status"></div>
+    <select class="period" id="period" aria-label="Periode">
+      <option value="upcoming">Event mendatang</option>
+      <option value="all">Semua tanggal</option>
+      <option value="past">Sudah lewat</option>
+    </select>
+  </div>
+
+  <div id="banner" hidden></div>
+  <div class="list" id="list"></div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="sheet" id="sheet" hidden aria-labelledby="sheet-title">
+  <header>
+    <h2 id="sheet-title">Booking baru</h2>
+    <button class="btn ghost" type="button" data-close>Tutup</button>
+  </header>
+  <form class="body" id="form" autocomplete="off">
+    <section class="sec">
+      <div class="sec-h"><h3>Customer</h3><span>* wajib diisi</span></div>
+      <div class="grid2">
+        <label class="f"><span class="lbl">Nama customer<span class="req">*</span></span><input id="f-customer" required placeholder="Yang menghubungi"></label>
+        <label class="f"><span class="lbl">Nama perusahaan</span><input id="f-company" placeholder="Opsional"></label>
+        <label class="f"><span class="lbl">PIC hari event</span><input id="f-pic" placeholder="Nama PIC"></label>
+        <label class="f"><span class="lbl">No. telp / WA<span class="req">*</span></span><input id="f-phone" type="tel" required placeholder="08…"></label>
+        <label class="f span2"><span class="lbl">Email</span><input id="f-email" type="email" placeholder="Opsional"></label>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h3>Event</h3></div>
+      <div class="grid3">
+        <label class="f"><span class="lbl">Tanggal event<span class="req">*</span></span><input id="f-date" type="date" required></label>
+        <label class="f"><span class="lbl">Jam mulai</span><input id="f-start" type="time"></label>
+        <label class="f"><span class="lbl">Jam selesai</span><input id="f-end" type="time"></label>
+        <label class="f"><span class="lbl">Jumlah orang (pax)<span class="req">*</span></span><input id="f-pax" type="number" min="1" inputmode="numeric" required placeholder="0"></label>
+        <label class="f"><span class="lbl">Area</span><input id="f-area" placeholder="Indoor / Outdoor"></label>
+        <label class="f"><span class="lbl">Jenis acara</span><input id="f-eventname" placeholder="Gathering, meeting…"></label>
+      </div>
+      <label class="f"><span class="lbl">Setup / layout</span><input id="f-setup" placeholder="Long table, theater, sound system, proyektor…"></label>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h3>Status &amp; DP</h3></div>
+      <div>
+        <div class="field-h">Status booking</div>
+        <div class="seg" role="radiogroup" aria-label="Status">
+          <label><input type="radio" name="status" value="early" checked>Early</label>
+          <label><input type="radio" name="status" value="negotiation">Negotiation</label>
+          <label><input type="radio" name="status" value="confirmed">Confirmed</label>
+        </div>
+      </div>
+      <div class="sub" id="dp-box" hidden>
+        <div>
+          <div class="field-h">Perlu DP?</div>
+          <div class="seg" role="radiogroup" aria-label="Perlu DP">
+            <label><input type="radio" name="dpneed" value="yes" checked>Ya, perlu DP</label>
+            <label><input type="radio" name="dpneed" value="no">Tanpa DP</label>
+          </div>
+        </div>
+        <div id="dp-fields" style="display:flex;flex-direction:column;gap:14px">
+          <div class="grid2">
+            <label class="f"><span class="lbl">Nominal DP (Rp)</span><input id="f-dpamount" inputmode="numeric" placeholder="0"></label>
+            <label class="f"><span class="lbl">Tanggal DP masuk</span><input id="f-dpdate" type="date"></label>
+          </div>
+          <label class="check"><input type="checkbox" id="f-dpreceived"> DP sudah diterima</label>
+          <div>
+            <div class="field-h">Bukti DP</div>
+            <div class="proof" id="proof"></div>
+            <div class="upload">
+              <label class="btn sm" id="upload-btn" for="f-dpfile">Upload file</label>
+              <input id="f-dpfile" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" hidden>
+              <span class="hint" id="upload-hint">Foto atau PDF, maks 20 MB.</span>
+            </div>
+          </div>
+          <label class="f"><span class="lbl">Atau link bukti DP</span><input id="f-dplink" type="url" placeholder="https://drive.google.com/…"></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h3>Menu</h3></div>
+      <div>
+        <div class="field-h">Tipe menu</div>
+        <div class="seg" role="radiogroup" aria-label="Tipe menu">
+          <label><input type="radio" name="menutype" value="Prasmanan" checked>Prasmanan</label>
+          <label><input type="radio" name="menutype" value="Pre-Order">Pre-Order</label>
+          <label><input type="radio" name="menutype" value="On the Spot">On the Spot</label>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="itemhead"><span>Nama menu</span><span>Jumlah</span><span class="note">Catatan</span><span></span></div>
+        <div class="items" id="items"></div>
+        <div><button class="btn sm" type="button" id="add-item">+ Tambah menu</button></div>
+      </div>
+      <div class="grid2">
+        <label class="f"><span class="lbl">Harga per pax (Rp)</span><input id="f-price" inputmode="numeric" placeholder="0"></label>
+        <label class="f"><span class="lbl">Estimasi total (Rp)</span><input id="f-total" inputmode="numeric" placeholder="Otomatis: harga × pax"></label>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h3>Request &amp; catatan</h3></div>
+      <label class="f"><span class="lbl">Special request</span><textarea id="f-special" placeholder="Alergi, dekorasi, kue ulang tahun, banner, vegetarian…"></textarea></label>
+      <label class="f"><span class="lbl">Notes internal</span><textarea id="f-notes" placeholder="Follow-up, hasil negosiasi, info pelunasan…"></textarea></label>
+    </section>
+  </form>
+  <footer>
+    <div class="confirm" id="del-zone"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" type="button" data-close>Batal</button>
+      <button class="btn primary" type="submit" form="form" id="save-btn">Simpan booking</button>
+    </div>
+  </footer>
+</aside>
+
+<div class="modal" id="beo" hidden role="dialog" aria-labelledby="beo-title">
+  <header>
+    <h2 id="beo-title">BEO</h2>
+    <div class="seg" role="radiogroup" aria-label="Format BEO">
+      <label><input type="radio" name="beofmt" value="wa" checked>Format WhatsApp</label>
+      <label><input type="radio" name="beofmt" value="plain">Teks biasa</label>
+    </div>
+  </header>
+  <pre class="beo" id="beo-text"></pre>
+  <footer>
+    <span class="hint">Tempel ke grup Kitchen, Bar, Service, dan Finance.</span>
+    <div style="display:flex;gap:8px">
+      <button class="btn" type="button" data-close>Tutup</button>
+      <button class="btn primary" type="button" id="copy-beo">Copy BEO</button>
+    </div>
+  </footer>
+</div>
+
+
+
+<!-- ============ USERS ============ -->
+<aside class="sheet" id="users" hidden aria-labelledby="users-title">
+  <header>
+    <h2 id="users-title">Kelola akses</h2>
+    <button class="btn ghost" type="button" data-close>Tutup</button>
+  </header>
+  <div class="body">
+    <section class="sec">
+      <div class="sec-h"><h3>Tambah user</h3></div>
+      <form id="u-form" onsubmit="return false" autocomplete="off" style="display:flex;flex-direction:column;gap:14px">
+        <div class="grid2">
+          <label class="f"><span class="lbl">Nama<span class="req">*</span></span><input id="u-name" required></label>
+          <label class="f"><span class="lbl">Email<span class="req">*</span></span><input id="u-email" type="email" required></label>
+          <label class="f"><span class="lbl">Password (min. 6)<span class="req">*</span></span><input id="u-pass" type="text" required minlength="6" autocomplete="new-password"></label>
+          <label class="f"><span class="lbl">Peran</span>
+            <select id="u-role" class="inp">
+              <option value="sales">Sales</option>
+              <option value="finance">Finance</option>
+              <option value="ops">Ops (Kitchen/Bar/Service)</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+        </div>
+        <ul class="roles-help">
+          <li><b>Admin</b>: semua akses booking, termasuk hapus. Tidak bisa kelola user.</li>
+          <li><b>Sales</b>: tambah & edit booking, ubah status, upload bukti DP, BEO.</li>
+          <li><b>Finance</b>: lihat semua, hanya bisa mengubah data DP.</li>
+          <li><b>Ops</b>: lihat booking & copy BEO saja.</li>
+        </ul>
+        <p class="err" id="u-err" hidden></p>
+        <div><button class="btn primary" type="submit" id="u-btn">Tambah user</button></div>
+      </form>
+    </section>
+    <section class="sec">
+      <div class="sec-h"><h3>Daftar user</h3><span id="u-count"></span></div>
+      <div id="u-list"><p class="hint">Memuat…</p></div>
+    </section>
+  </div>
+</aside>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+const SUPABASE_URL="https://gmokhluachlqhjgmhfyy.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdtb2tobHVhY2hscWhqZ21oZnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1NTgyNTcsImV4cCI6MjEwODEzNDI1N30.5HWZTLg7Btf3Uj7WbojUIWsD-lVb6nbNK4M7LdYnaDE";
+const NET_MSG="Tidak bisa terhubung ke server. Pastikan halaman dibuka di browser biasa (Chrome/Safari) dari link hosting atau file yang didownload, bukan dari preview di dalam Claude, dan koneksi internet aktif.";
+if(typeof window.supabase==="undefined"){const m=document.getElementById("net-msg");m.textContent=NET_MSG;m.hidden=false;document.querySelectorAll("#v-login button").forEach(b=>b.disabled=true);return}
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const isNetErr=e=>/fetch|network|load failed|NetworkError/i.test(String(e&&(e.message||e)));
+
+const $=s=>document.querySelector(s);
+const STATUS={early:{label:"Early"},negotiation:{label:"Negotiation"},confirmed:{label:"Confirmed"}};
+const ROLE_LABEL={master_admin:"Master Admin",admin:"Admin",sales:"Sales",finance:"Finance",ops:"Ops",pending:"Belum ada peran"};
+const MONTHS=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const MONTHS_L=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const DAYS=["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+
+let me=null, bookings=[], channel=null;
+let filter={q:"",status:"all",period:"upcoming"};
+let editing=null, pendingProof=null, beoBooking=null;
+
+const can={
+  create:()=>["master_admin","admin","sales"].includes(me?.role),
+  editAll:()=>["master_admin","admin","sales"].includes(me?.role),
+  editDp:()=>["master_admin","admin","sales","finance"].includes(me?.role),
+  remove:()=>["master_admin","admin"].includes(me?.role),
+  users:()=>me?.role==="master_admin"
+};
+
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=v=>{const n=parseInt(String(v??"").replace(/[^\d]/g,""),10);return isNaN(n)?0:n};
+const rp=n=>n?"Rp "+Number(n).toLocaleString("id-ID"):"-";
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parseD(s){if(!s)return null;const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
+function longDate(s){const d=parseD(s);return d?`${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS_L[d.getMonth()]} ${d.getFullYear()}`:"-"}
+function shortDate(s){const d=parseD(s);return d?`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`:"-"}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600)}
+function showErr(el,msg){el.textContent=msg;el.hidden=!msg}
+function beoNo(b){return "BEO-RR-"+(b.eventDate||"").replace(/-/g,"")+"-"+String(b.id||"").slice(0,4).toUpperCase()}
+function dpState(b){
+  if(b.status!=="confirmed")return null;
+  if(!b.dpNeeded)return {cls:"",txt:"Tanpa DP"};
+  if(b.dpReceived)return {cls:"ok",txt:"DP diterima"+(b.dpAmount?" · "+rp(b.dpAmount):"")};
+  return {cls:"due",txt:"DP belum masuk"+(b.dpAmount?" · "+rp(b.dpAmount):"")};
+}
+
+/* ---------- mapping DB <-> app ---------- */
+function fromRow(r){return{id:r.id,company:r.company||"",customer:r.customer||"",pic:r.pic||"",phone:r.phone||"",email:r.email||"",
+  eventDate:r.event_date||"",startTime:r.start_time||"",endTime:r.end_time||"",pax:r.pax||0,area:r.area||"",eventName:r.event_name||"",setup:r.setup||"",
+  status:r.status,dpNeeded:r.dp_needed,dpAmount:r.dp_amount||0,dpDate:r.dp_date||"",dpReceived:r.dp_received,dpLink:r.dp_link||"",dpProofPath:r.dp_proof_path||"",
+  menuType:r.menu_type||"",items:r.items||[],pricePerPax:r.price_per_pax||0,total:r.total||0,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at}}
+function toRow(b){return{company:b.company||null,customer:b.customer,pic:b.pic||null,phone:b.phone||null,email:b.email||null,
+  event_date:b.eventDate||null,start_time:b.startTime||null,end_time:b.endTime||null,pax:b.pax||0,area:b.area||null,event_name:b.eventName||null,setup:b.setup||null,
+  status:b.status,dp_needed:!!b.dpNeeded,dp_amount:b.dpAmount||0,dp_date:b.dpDate||null,dp_received:!!b.dpReceived,dp_link:b.dpLink||null,dp_proof_path:b.dpProofPath||null,
+  menu_type:b.menuType||null,items:b.items||[],price_per_pax:b.pricePerPax||0,total:b.total||0,special:b.special||null,notes:b.notes||null}}
+
+/* ---------- auth flow ---------- */
+function show(view){["#v-login","#v-pending","#v-app"].forEach(v=>$(v).hidden=v!==view)}
+async function boot(){
+  let session=null;
+  try{({data:{session}}=await sb.auth.getSession())}catch(e){}
+  if(!session){return showLogin()}
+  const {data:prof,error}=await sb.from("profiles").select("id,email,full_name,role,active").eq("id",session.user.id).single();
+  if(error||!prof||!prof.active||prof.role==="pending"){$("#p-email").textContent=session.user.email;show("#v-pending");return}
+  me=prof;
+  $("#me-name").textContent=prof.full_name||prof.email;
+  $("#me-role").textContent=ROLE_LABEL[prof.role];$("#me-role").className="role "+prof.role;
+  $("#btn-new").hidden=!can.create();$("#btn-users").hidden=!can.users();
+  show("#v-app");renderChips();await loadBookings();subscribe();
+}
+async function showLogin(){
+  show("#v-login");$("#login-form").hidden=false;$("#setup-form").hidden=true;
+  try{const {data,error}=await sb.rpc("has_master_admin");if(error)throw error;$("#to-setup").hidden=!!data;$("#net-msg").hidden=true}
+  catch(e){$("#to-setup").hidden=true;if(isNetErr(e)){$("#net-msg").textContent=NET_MSG;$("#net-msg").hidden=false}}
+}
+$("#login-form").addEventListener("submit",async e=>{
+  e.preventDefault();showErr($("#l-err"),"");const btn=$("#l-btn");btn.disabled=true;btn.textContent="Masuk…";
+  let error;
+  try{({error}=await sb.auth.signInWithPassword({email:$("#l-email").value.trim(),password:$("#l-pass").value}))}catch(e){error=e}
+  btn.disabled=false;btn.textContent="Masuk";
+  if(error){showErr($("#l-err"),isNetErr(error)?NET_MSG:/confirm/i.test(error.message)?"Email belum dikonfirmasi. Hubungi Master Admin.":"Email atau password salah.");return}
+  $("#l-pass").value="";boot();
+});
+$("#to-setup").onclick=()=>{$("#login-form").hidden=true;$("#to-setup").hidden=true;$("#setup-form").hidden=false};
+$("#to-login").onclick=showLogin;
+$("#setup-form").addEventListener("submit",async e=>{
+  e.preventDefault();showErr($("#s-err"),"");$("#s-ok").hidden=true;
+  if($("#s-pass").value!==$("#s-pass2").value){showErr($("#s-err"),"Password tidak sama.");return}
+  const btn=$("#s-btn");btn.disabled=true;
+  const email=$("#s-email").value.trim(),password=$("#s-pass").value;
+  let data,error;
+  try{({data,error}=await sb.auth.signUp({email,password,options:{data:{full_name:"Steven"}}}))}catch(e){error=e}
+  if(error){btn.disabled=false;showErr($("#s-err"),isNetErr(error)?NET_MSG:/registered|exists/i.test(error.message)?"Email ini sudah terdaftar. Silakan login.":/password/i.test(error.message)?"Password minimal 6 karakter.":error.message);return}
+  if(data.session){boot();return}
+  const {error:le}=await sb.auth.signInWithPassword({email,password});
+  btn.disabled=false;
+  if(!le){boot();return}
+  $("#s-ok").textContent="Akun dibuat. Silakan login.";$("#s-ok").hidden=false;
+});
+document.addEventListener("click",async e=>{if(e.target.closest("[data-logout]")){if(channel)sb.removeChannel(channel);channel=null;await sb.auth.signOut();me=null;bookings=[];closeAll();showLogin()}});
+sb.auth.onAuthStateChange((ev)=>{if(ev==="SIGNED_IN"&&!me&&location.hash.includes("access_token"))boot()});
+
+/* ---------- data ---------- */
+async function loadBookings(){
+  const {data,error}=await sb.from("bookings").select("*").order("event_date",{ascending:true});
+  if(error){$("#list").innerHTML=`<div class="empty">Gagal memuat data. Muat ulang halaman.</div>`;return}
+  bookings=data.map(fromRow);render();
+  if(beoBooking){const f=bookings.find(x=>x.id===beoBooking.id);if(f){beoBooking=f;renderBeo()}}
+}
+function subscribe(){
+  if(channel)return;
+  let t;channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings"},()=>{clearTimeout(t);t=setTimeout(loadBookings,300)}).subscribe();
+}
+
+/* ---------- list ---------- */
+function renderChips(){
+  const opts=[["all","Semua"],["early","Early"],["negotiation","Negotiation"],["confirmed","Confirmed"],["dpdue","DP belum masuk"]];
+  $("#chips").innerHTML=opts.map(([v,l])=>`<button type="button" class="chip" data-v="${v}" aria-pressed="${filter.status===v}">${l}</button>`).join("");
+}
+function visible(){
+  const t=today(),q=filter.q.toLowerCase();
+  return bookings.filter(b=>{
+    if(filter.period==="upcoming"&&b.eventDate&&b.eventDate<t)return false;
+    if(filter.period==="past"&&!(b.eventDate&&b.eventDate<t))return false;
+    if(filter.status==="dpdue"){const s=dpState(b);if(!s||s.cls!=="due")return false}
+    else if(filter.status!=="all"&&b.status!==filter.status)return false;
+    if(q){const hay=[b.company,b.customer,b.pic,b.phone,b.eventName].join(" ").toLowerCase();if(!hay.includes(q))return false}
+    return true;
+  }).sort((a,b)=>filter.period==="past"?(b.eventDate||"").localeCompare(a.eventDate||""):(a.eventDate||"9").localeCompare(b.eventDate||"9"));
+}
+function render(){
+  const t=today(),up=bookings.filter(b=>!b.eventDate||b.eventDate>=t);
+  const cnt=s=>up.filter(b=>b.status===s).length;
+  const paxConf=up.filter(b=>b.status==="confirmed").reduce((a,b)=>a+(+b.pax||0),0);
+  const dpDue=up.filter(b=>{const s=dpState(b);return s&&s.cls==="due"}).length;
+  $("#stats").innerHTML=[
+    [cnt("early"),"Early","var(--early)"],[cnt("negotiation"),"Negotiation","var(--nego)"],[cnt("confirmed"),"Confirmed","var(--conf)"],
+    [paxConf.toLocaleString("id-ID"),"Pax confirmed mendatang",""],[dpDue,"DP belum masuk","var(--warn)"]
+  ].map(([n,l,c])=>`<div class="stat"><b>${n}</b><span>${c?`<i class="dot" style="background:${c}"></i>`:""}${l}</span></div>`).join("");
+  const list=$("#list"),rows=visible();
+  if(!bookings.length){
+    list.innerHTML=`<div class="empty"><h3>Belum ada booking corporate</h3><p>Setiap inquiry event masuk dicatat di sini, dari tahap Early sampai Confirmed.<br>BEO bisa dibuat dari booking mana pun.</p>${can.create()?`<button class="btn primary" type="button" data-new>+ Catat booking pertama</button>`:""}</div>`;return;
+  }
+  if(!rows.length){list.innerHTML=`<div class="empty"><h3>Tidak ada booking yang cocok</h3><p>Ubah filter status, periode, atau kata pencarian.</p></div>`;return}
+  const editable=can.editAll();
+  list.innerHTML=rows.map(b=>{
+    const d=parseD(b.eventDate),dp=dpState(b),past=b.eventDate&&b.eventDate<t;
+    const items=(b.items||[]).filter(i=>i.name).map(i=>i.name);
+    return `<div class="row${past?" past":""}">
+      <div class="date">${d?`<b>${d.getDate()}</b><span>${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</span>`:`<span>Tgl ?</span>`}</div>
+      <div class="who"><h3>${esc(b.company||b.customer)||"(Tanpa nama)"}</h3><p>${b.company?esc(b.customer||"-"):"Perorangan / tanpa perusahaan"}${b.pic&&b.pic!==b.customer?" · PIC "+esc(b.pic):""} · ${esc(b.phone||"-")}${b.startTime?" · "+esc(b.startTime)+(b.endTime?"–"+esc(b.endTime):""):""}</p></div>
+      <div class="pax"><b>${+b.pax||0}</b><span>pax</span></div>
+      <div class="menu"><b>${esc(b.menuType||"-")}</b><span title="${esc(items.join(", "))}">${items.length?esc(items.join(", ")):"Menu belum dipilih"}</span></div>
+      <div class="st">
+        <select class="pill ${b.status}" data-status="${b.id}" aria-label="Ubah status"${editable?"":" disabled"}>${Object.entries(STATUS).map(([k,v])=>`<option value="${k}"${k===b.status?" selected":""}>${v.label}</option>`).join("")}</select>
+        ${dp?`<span class="dp ${dp.cls}">${esc(dp.txt)}</span>`:""}
+      </div>
+      <div class="acts"><button class="btn sm" type="button" data-beo="${b.id}">BEO</button><button class="btn sm ghost" type="button" data-edit="${b.id}">${can.editDp()?"Edit":"Lihat"}</button></div>
+    </div>`}).join("");
+}
+
+/* ---------- booking form ---------- */
+function setRadio(name,val){const el=document.querySelector(`input[name="${name}"][value="${val}"]`);if(el)el.checked=true}
+function getRadio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value}
+function itemRow(it={}){
+  const div=document.createElement("div");div.className="item";
+  div.innerHTML=`<input class="inp nm" placeholder="Nama menu" value="${esc(it.name)}" aria-label="Nama menu"><input class="inp qt" placeholder="Qty" value="${esc(it.qty)}" aria-label="Jumlah"><input class="inp note" placeholder="Catatan" value="${esc(it.note)}" aria-label="Catatan menu"><button type="button" class="x" aria-label="Hapus menu">×</button>`;
+  div.querySelector(".x").onclick=()=>div.remove();
+  return div;
+}
+function syncDp(){$("#dp-box").hidden=getRadio("status")!=="confirmed";$("#dp-fields").hidden=getRadio("dpneed")!=="yes"}
+async function renderProof(){
+  const p=$("#proof");
+  if(!pendingProof){p.innerHTML="";return}
+  p.innerHTML=`<span class="hint">Memuat bukti DP…</span>`;
+  const {data}=await sb.storage.from("dp-proofs").createSignedUrl(pendingProof,3600);
+  const url=data?.signedUrl;
+  if(!url){p.innerHTML=`<span class="hint">Bukti DP tidak bisa dimuat.</span>`;return}
+  const isPdf=/\.pdf$/i.test(pendingProof);
+  p.innerHTML=(isPdf?`<span class="hint">PDF terlampir</span>`:`<img src="${url}" alt="Bukti DP">`)+`<a href="${url}" target="_blank" rel="noopener">Lihat bukti DP</a>`+
+    (can.editDp()?`<button type="button" class="btn sm ghost" id="rm-proof">Lepas file</button>`:"");
+  const rm=$("#rm-proof");if(rm)rm.onclick=()=>{pendingProof=null;renderProof()};
+}
+function lockForm(){
+  const all=can.editAll(),dp=can.editDp();
+  const dpIds=["f-dpamount","f-dpdate","f-dpreceived","f-dplink"];
+  document.querySelectorAll("#form input, #form textarea").forEach(el=>{
+    const isDp=dpIds.includes(el.id)||el.name==="dpneed";
+    el.disabled=!(all||(dp&&isDp));
+  });
+  document.querySelectorAll("#form .seg").forEach(s=>{const isDp=!!s.querySelector('input[name="dpneed"]');s.classList.toggle("locked",!(all||(dp&&isDp)))});
+  $("#add-item").hidden=!all;document.querySelectorAll("#items .x").forEach(x=>x.hidden=!all);
+  $("#upload-btn").hidden=!dp;$("#upload-hint").hidden=!dp;
+  $("#save-btn").hidden=!dp;
+  if(me.role==="finance")$("#sheet-title").textContent="Update DP";
+}
+function openForm(b){
+  editing=b||null;
+  const f=b||{status:"early",dpNeeded:true,menuType:"Prasmanan",items:[]};
+  $("#sheet-title").textContent=b?(can.editDp()?"Edit booking":"Detail booking"):"Booking baru";
+  const set=(id,v)=>{$(id).value=v??""};
+  set("#f-company",f.company);set("#f-customer",f.customer);set("#f-pic",f.pic);set("#f-phone",f.phone);set("#f-email",f.email);
+  set("#f-date",f.eventDate);set("#f-start",f.startTime);set("#f-end",f.endTime);set("#f-pax",f.pax||"");set("#f-area",f.area);set("#f-eventname",f.eventName);set("#f-setup",f.setup);
+  set("#f-dpamount",f.dpAmount?Number(f.dpAmount).toLocaleString("id-ID"):"");set("#f-dpdate",f.dpDate);$("#f-dpreceived").checked=!!f.dpReceived;set("#f-dplink",f.dpLink);
+  set("#f-price",f.pricePerPax?Number(f.pricePerPax).toLocaleString("id-ID"):"");set("#f-total",f.total?Number(f.total).toLocaleString("id-ID"):"");
+  set("#f-special",f.special);set("#f-notes",f.notes);
+  setRadio("status",f.status||"early");setRadio("dpneed",f.dpNeeded===false?"no":"yes");setRadio("menutype",f.menuType||"Prasmanan");
+  pendingProof=f.dpProofPath||null;renderProof();
+  const items=$("#items");items.innerHTML="";(f.items&&f.items.length?f.items:(can.editAll()?[{},{}]:[])).forEach(i=>items.appendChild(itemRow(i)));
+  $("#upload-hint").textContent="Foto atau PDF, maks 20 MB.";
+  $("#del-zone").innerHTML=b&&can.remove()?`<button class="btn sm ghost danger" type="button" id="del">Hapus booking</button>`:"";
+  if($("#del"))$("#del").onclick=askDelete;
+  syncDp();lockForm();
+  $("#scrim").hidden=false;$("#sheet").hidden=false;
+}
+function askDelete(){
+  $("#del-zone").innerHTML=`<span>Hapus booking ini permanen?</span><button class="btn sm danger" type="button" id="del-yes">Ya, hapus</button><button class="btn sm ghost" type="button" id="del-no">Tidak</button>`;
+  $("#del-no").onclick=()=>{$("#del-zone").innerHTML=`<button class="btn sm ghost danger" type="button" id="del">Hapus booking</button>`;$("#del").onclick=askDelete};
+  $("#del-yes").onclick=async()=>{
+    const {error}=await sb.from("bookings").delete().eq("id",editing.id);
+    if(error){toast("Gagal menghapus: "+error.message);return}
+    if(editing.dpProofPath)await sb.storage.from("dp-proofs").remove([editing.dpProofPath]);
+    closeAll();toast("Booking dihapus");loadBookings();
+  };
+}
+function closeAll(){["#scrim","#sheet","#beo","#users"].forEach(s=>$(s).hidden=true);editing=null;beoBooking=null}
+
+$("#f-dpfile").addEventListener("change",async e=>{
+  const file=e.target.files[0];if(!file)return;
+  const hint=$("#upload-hint");
+  if(file.size>20*1024*1024){hint.textContent="File terlalu besar (maks 20 MB).";e.target.value="";return}
+  hint.textContent="Mengupload…";
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const path=`${new Date().toISOString().slice(0,7)}/${crypto.randomUUID()}.${ext}`;
+  const {error}=await sb.storage.from("dp-proofs").upload(path,file,{contentType:file.type||undefined});
+  e.target.value="";
+  if(error){hint.textContent=/mime|type/i.test(error.message)?"Format tidak didukung. Pakai JPG, PNG, WEBP, atau PDF.":"Upload gagal: "+error.message;return}
+  pendingProof=path;renderProof();$("#f-dpreceived").checked=true;
+  hint.textContent="Bukti DP terupload. Klik Simpan untuk menyimpan.";
+});
+
+$("#form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const items=[...document.querySelectorAll("#items .item")].map(r=>({name:r.querySelector(".nm").value.trim(),qty:r.querySelector(".qt").value.trim(),note:r.querySelector(".note").value.trim()})).filter(i=>i.name);
+  const pax=num($("#f-pax").value),price=num($("#f-price").value);
+  const status=getRadio("status"),dpNeeded=getRadio("dpneed")==="yes";
+  const b={
+    company:$("#f-company").value.trim(),customer:$("#f-customer").value.trim(),pic:$("#f-pic").value.trim(),phone:$("#f-phone").value.trim(),email:$("#f-email").value.trim(),
+    eventDate:$("#f-date").value,startTime:$("#f-start").value,endTime:$("#f-end").value,pax,area:$("#f-area").value.trim(),eventName:$("#f-eventname").value.trim(),setup:$("#f-setup").value.trim(),
+    status,dpNeeded:status==="confirmed"?dpNeeded:true,dpAmount:num($("#f-dpamount").value),dpDate:$("#f-dpdate").value,dpReceived:$("#f-dpreceived").checked,dpLink:$("#f-dplink").value.trim(),
+    dpProofPath:pendingProof||"",menuType:getRadio("menutype"),items,pricePerPax:price,total:num($("#f-total").value)||price*pax,
+    special:$("#f-special").value.trim(),notes:$("#f-notes").value.trim()
+  };
+  if(!b.customer&&editing)b.customer=editing.customer;
+  const btn=$("#save-btn");btn.disabled=true;btn.textContent="Menyimpan…";
+  const q=editing?sb.from("bookings").update(toRow(b)).eq("id",editing.id):sb.from("bookings").insert(toRow(b));
+  const {error}=await q;
+  btn.disabled=false;btn.textContent="Simpan booking";
+  if(error){toast("Gagal menyimpan: "+error.message);return}
+  if(editing&&editing.dpProofPath&&editing.dpProofPath!==b.dpProofPath&&can.remove())sb.storage.from("dp-proofs").remove([editing.dpProofPath]);
+  closeAll();toast("Booking disimpan");loadBookings();
+});
+
+/* ---------- BEO ---------- */
+function buildBeo(b,wa){
+  const H=s=>wa?`*${s}*`:s, line="------------------------------";const L=[];
+  L.push(H("BANQUET EVENT ORDER (BEO)"));L.push("Rusty Rabbit Cafe – Kuningan");
+  L.push(`No. BEO : ${beoNo(b)}`);L.push(`Dibuat  : ${shortDate(today())}`);L.push(line);
+  L.push(H("DETAIL EVENT"));
+  if(b.company)L.push(`Perusahaan : ${b.company}`);
+  if(b.eventName)L.push(`Acara      : ${b.eventName}`);
+  L.push(`Tanggal    : ${longDate(b.eventDate)}`);
+  L.push(`Jam        : ${b.startTime||"-"}${b.endTime?" – "+b.endTime:""}`);
+  L.push(`Jumlah     : ${b.pax||0} pax`);L.push(`Area       : ${b.area||"-"}`);
+  if(b.setup)L.push(`Setup      : ${b.setup}`);
+  L.push(`Status     : ${(STATUS[b.status]?.label||"-").toUpperCase()}`);L.push("");
+  L.push(H("KONTAK"));L.push(`Customer : ${b.customer||"-"}`);L.push(`PIC      : ${b.pic||"-"}`);L.push(`Telp/WA  : ${b.phone||"-"}`);
+  if(b.email)L.push(`Email    : ${b.email}`);L.push("");
+  L.push(H(`MENU – ${(b.menuType||"-").toUpperCase()}`));
+  const items=(b.items||[]).filter(i=>i.name);
+  if(items.length)items.forEach((i,n)=>L.push(`${n+1}. ${i.name}${i.qty?" — "+i.qty+(/^\d+$/.test(i.qty)?" porsi":""):""}${i.note?" ("+i.note+")":""}`));
+  else L.push("Menu belum ditentukan");
+  L.push("");L.push(H("SPECIAL REQUEST"));L.push(b.special||"-");L.push("");
+  L.push(H("PEMBAYARAN"));L.push(`Harga/pax : ${rp(b.pricePerPax)}`);L.push(`Estimasi  : ${rp(b.total)}`);
+  if(b.status==="confirmed"){
+    if(!b.dpNeeded)L.push("DP        : Tanpa DP");
+    else L.push(`DP        : ${rp(b.dpAmount)} – ${b.dpReceived?"SUDAH DITERIMA"+(b.dpDate?" ("+shortDate(b.dpDate)+")":""):"BELUM DITERIMA"}`);
+  }else L.push("DP        : Booking belum confirmed");
+  if(b.notes){L.push("");L.push(H("CATATAN"));L.push(b.notes)}
+  L.push(line);L.push(H("TIM TERKAIT"));
+  L.push("Kitchen  : siapkan menu & jumlah porsi sesuai BEO");L.push("Bar      : minuman sesuai menu & jumlah pax");
+  L.push("Service  : setup area & standby sesuai jam event");L.push("Finance  : cek DP & pelunasan");
+  return L.join("\n");
+}
+function renderBeo(){$("#beo-title").textContent=beoNo(beoBooking);$("#beo-text").textContent=buildBeo(beoBooking,getRadio("beofmt")==="wa")}
+function openBeo(b){beoBooking=b;renderBeo();$("#scrim").hidden=false;$("#beo").hidden=false}
+document.querySelectorAll('input[name="beofmt"]').forEach(r=>r.addEventListener("change",()=>beoBooking&&renderBeo()));
+$("#copy-beo").addEventListener("click",()=>{
+  const text=$("#beo-text").textContent;
+  const fallback=()=>{const r=document.createRange();r.selectNodeContents($("#beo-text"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Teks terpilih. Tekan Ctrl/Cmd+C untuk copy.")};
+  try{navigator.clipboard.writeText(text).then(()=>toast("BEO tercopy"),fallback)}catch(e){fallback()}
+});
+
+/* ---------- users (Master Admin) ---------- */
+async function callUsers(body){
+  const {data,error}=await sb.functions.invoke("manage-users",{body});
+  if(error){let msg=error.message;try{const j=await error.context.json();msg=j.error||msg}catch(_){}throw new Error(msg)}
+  if(data&&data.error)throw new Error(data.error);
+  return data;
+}
+async function loadUsers(){
+  const box=$("#u-list");
+  try{
+    const {users}=await callUsers({action:"list"});
+    $("#u-count").textContent=users.length+" akun";
+    box.innerHTML=users.map(u=>{
+      const isMaster=u.role==="master_admin";
+      return `<div class="urow${u.active?"":" off"}" data-uid="${u.id}">
+        <div class="who"><h3 style="font-size:15px">${esc(u.full_name||"-")}${u.active?"":" · nonaktif"}</h3><p>${esc(u.email)}</p></div>
+        ${isMaster?`<span class="role master_admin">Master Admin</span>`:`<select data-role aria-label="Peran ${esc(u.email)}">${["admin","sales","finance","ops"].map(r=>`<option value="${r}"${u.role===r?" selected":""}>${ROLE_LABEL[r]}</option>`).join("")}${u.role==="pending"?`<option value="pending" selected disabled>Belum ada peran</option>`:""}</select>`}
+        <div class="acts">${isMaster?"":`<button class="btn sm ghost" type="button" data-pw>Reset password</button><button class="btn sm ghost" type="button" data-toggle>${u.active?"Nonaktifkan":"Aktifkan"}</button><button class="btn sm ghost danger" type="button" data-deluser>Hapus</button>`}</div>
+      </div>`}).join("");
+  }catch(err){box.innerHTML=`<p class="err">${esc(err.message)}</p>`}
+}
+$("#btn-users").onclick=()=>{$("#scrim").hidden=false;$("#users").hidden=false;loadUsers()};
+$("#u-form").addEventListener("submit",async e=>{
+  e.preventDefault();showErr($("#u-err"),"");const btn=$("#u-btn");btn.disabled=true;btn.textContent="Menambah…";
+  try{
+    await callUsers({action:"create",full_name:$("#u-name").value.trim(),email:$("#u-email").value.trim(),password:$("#u-pass").value,role:$("#u-role").value});
+    toast("User ditambahkan. Kirim email & password ke orangnya.");$("#u-form").reset();loadUsers();
+  }catch(err){showErr($("#u-err"),err.message)}
+  btn.disabled=false;btn.textContent="Tambah user";
+});
+$("#u-list").addEventListener("change",async e=>{
+  const s=e.target.closest("[data-role]");if(!s)return;const id=s.closest("[data-uid]").dataset.uid;
+  try{await callUsers({action:"update",id,role:s.value});toast("Peran diubah")}catch(err){toast(err.message);loadUsers()}
+});
+$("#u-list").addEventListener("click",async e=>{
+  const row=e.target.closest("[data-uid]");if(!row)return;const id=row.dataset.uid;
+  if(e.target.closest("[data-toggle]")){
+    const active=row.classList.contains("off");
+    try{await callUsers({action:"update",id,active});toast(active?"User diaktifkan":"User dinonaktifkan");loadUsers()}catch(err){toast(err.message)}
+  }
+  if(e.target.closest("[data-pw]")){
+    const acts=row.querySelector(".acts");
+    acts.innerHTML=`<input class="inp" style="height:32px;width:150px" placeholder="Password baru" data-newpw minlength="6"><button class="btn sm primary" type="button" data-savepw>Simpan</button><button class="btn sm ghost" type="button" data-cancel>Batal</button>`;
+    acts.querySelector("[data-newpw]").focus();
+  }
+  if(e.target.closest("[data-savepw]")){
+    const pw=row.querySelector("[data-newpw]").value;
+    if(pw.length<6){toast("Password minimal 6 karakter");return}
+    try{await callUsers({action:"update",id,password:pw});toast("Password diganti");loadUsers()}catch(err){toast(err.message)}
+  }
+  if(e.target.closest("[data-cancel]"))loadUsers();
+  if(e.target.closest("[data-deluser]")){
+    const acts=row.querySelector(".acts");
+    acts.innerHTML=`<span class="hint">Hapus akun ini?</span><button class="btn sm danger" type="button" data-delyes>Ya, hapus</button><button class="btn sm ghost" type="button" data-cancel>Batal</button>`;
+  }
+  if(e.target.closest("[data-delyes]")){
+    try{await callUsers({action:"delete",id});toast("User dihapus");loadUsers()}catch(err){toast(err.message)}
+  }
+});
+
+/* ---------- events ---------- */
+$("#btn-new").onclick=()=>openForm(null);
+$("#add-item").onclick=()=>{const r=itemRow();$("#items").appendChild(r);r.querySelector(".nm").focus()};
+document.querySelectorAll('input[name="status"],input[name="dpneed"]').forEach(r=>r.addEventListener("change",syncDp));
+["#f-dpamount","#f-price","#f-total"].forEach(id=>$(id).addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}));
+$("#scrim").onclick=closeAll;
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeAll);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#scrim").hidden)closeAll()});
+$("#q").addEventListener("input",e=>{filter.q=e.target.value;render()});
+$("#period").addEventListener("change",e=>{filter.period=e.target.value;render()});
+$("#chips").addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c)return;filter.status=c.dataset.v;renderChips();render()});
+$("#list").addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.new!==undefined)openForm(null);
+  const find=id=>bookings.find(b=>b.id===id);
+  if(t.dataset.edit)openForm(find(t.dataset.edit));
+  if(t.dataset.beo)openBeo(find(t.dataset.beo));
+});
+$("#list").addEventListener("change",async e=>{
+  const s=e.target.closest("select[data-status]");if(!s)return;
+  const {error}=await sb.from("bookings").update({status:s.value}).eq("id",s.dataset.status);
+  if(error){toast("Gagal mengubah status.");render();return}
+  toast(`Status: ${STATUS[s.value].label}`);loadBookings();
+});
+boot();
+})();
+</script>
+
+</body>
+</html>
