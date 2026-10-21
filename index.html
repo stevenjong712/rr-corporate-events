@@ -72,7 +72,7 @@ select.period{border:1px solid var(--line);background:var(--surface);border-radi
 
 /* list */
 .list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
-.row{display:grid;grid-template-columns:64px minmax(0,1.6fr) 80px minmax(0,1fr) 150px auto;gap:16px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
+.row{display:grid;grid-template-columns:64px minmax(0,1.6fr) 130px minmax(0,1fr) 150px auto;gap:16px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
 .row.past{opacity:.62}
 .date{text-align:center;border-right:1px solid var(--line);padding-right:12px}
@@ -82,6 +82,15 @@ select.period{border:1px solid var(--line);background:var(--surface);border-radi
 .who h3{font-size:16px;font-weight:700;font-stretch:90%;overflow-wrap:anywhere}
 .who p{margin:2px 0 0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
 .pax b{font-family:var(--f-display);font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.amt{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.amt.none{color:var(--muted);font-weight:400}
+.sumbar{display:flex;justify-content:space-between;align-items:baseline;gap:8px 16px;flex-wrap:wrap;padding:12px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.sumbar span{color:var(--muted);font-size:13px}
+.sumbar b{font-family:var(--f-display);font-size:22px;font-weight:700;font-stretch:85%;font-variant-numeric:tabular-nums;color:var(--accent)}
+.reason{font-size:13px;color:var(--ink);background:var(--bg);border-left:3px solid var(--line);padding:4px 10px;margin-top:6px;overflow-wrap:anywhere}
+.row.cx{grid-template-columns:64px minmax(0,1.6fr) 130px minmax(0,1.4fr) auto}
+.row.cx .date b{text-decoration:line-through;text-decoration-thickness:2px}
+@media (max-width:860px){.row.cx{grid-template-columns:56px minmax(0,1fr) auto;grid-template-areas:"d w p" "d m m" "a a a"}}
 .pax span{font-size:12px;color:var(--muted);margin-left:2px}
 .menu{min-width:0;font-size:13px}
 .menu b{display:block;font-weight:600}
@@ -238,7 +247,7 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
     <div class="brand">
       <small>Rusty Rabbit Cafe · Kuningan</small>
       <h1>Corporate Event Bookings</h1>
-      <div class="mode" id="mode">Tersinkron untuk seluruh tim · versi 21 Okt (pajak 10%)</div>
+      <div class="mode" id="mode">Tersinkron untuk seluruh tim · versi 21 Okt · daftar batal</div>
     </div>
     <div class="userbar">
       <span class="me"><span id="me-name"></span><span class="role" id="me-role"></span></span>
@@ -257,10 +266,12 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
       <option value="upcoming">Event mendatang</option>
       <option value="all">Semua tanggal</option>
       <option value="past">Sudah lewat</option>
+      <option value="cancelled">Dibatalkan / dihapus</option>
     </select>
   </div>
 
   <div id="banner" hidden></div>
+  <div class="sumbar" id="sumbar"></div>
   <div class="list" id="list"></div>
 </div>
 
@@ -436,6 +447,16 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
   </div>
 </aside>
 
+<div class="modal" id="cancel" hidden role="dialog" aria-labelledby="cancel-title" style="z-index:22;width:min(480px,calc(100% - 24px))">
+  <header><h2 id="cancel-title">Batalkan / hapus booking</h2></header>
+  <div style="padding:18px;display:flex;flex-direction:column;gap:12px">
+    <p style="margin:0" id="cancel-who"></p>
+    <label class="f"><span class="lbl">Alasan (opsional)</span><textarea id="cancel-reason" placeholder="Contoh: customer batal karena budget, pindah tanggal, double input…"></textarea></label>
+    <p class="hint">Booking dipindah ke daftar <b>Dibatalkan / dihapus</b> dan masih bisa dipulihkan.</p>
+  </div>
+  <footer><span></span><div style="display:flex;gap:8px"><button class="btn" type="button" id="cancel-no">Kembali</button><button class="btn primary" type="button" id="cancel-yes">Batalkan booking</button></div></footer>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -484,6 +505,8 @@ function renderCalc(){
     ($("#f-tax").checked?`<div><span>Pajak 10%${$("#f-svc").checked?" (dari subtotal + service)":""}</span><b>${rp(c.tax)}</b></div>`:"")+
     `<div class="tot"><span>Estimasi total</span><b>${rp(c.total)}</b></div>`;
 }
+function bTotal(b){return calcTotals(b.pricePerPax||0,b.pax||0,b.withService,b.withTax).total}
+function amtHtml(b){const v=bTotal(b);return v?`<div class="amt">${rp(v)}</div>`:`<div class="amt none">Harga belum diisi</div>`}
 function beoNo(b){return "BEO-RR-"+(b.eventDate||"").replace(/-/g,"")+"-"+String(b.id||"").slice(0,4).toUpperCase()}
 function dpState(b){
   if(b.status!=="confirmed")return null;
@@ -496,7 +519,7 @@ function dpState(b){
 function fromRow(r){return{id:r.id,company:r.company||"",customer:r.customer||"",pic:r.pic||"",phone:r.phone||"",email:r.email||"",
   eventDate:r.event_date||"",startTime:r.start_time||"",endTime:r.end_time||"",pax:r.pax||0,area:r.area||"",eventName:r.event_name||"",setup:r.setup||"",
   status:r.status,dpNeeded:r.dp_needed,dpAmount:r.dp_amount||0,dpDate:r.dp_date||"",dpReceived:r.dp_received,dpLink:r.dp_link||"",dpProofPath:r.dp_proof_path||"",
-  menuType:r.menu_type||"",items:r.items||[],pricePerPax:r.price_per_pax||0,total:r.total||0,withService:!!r.with_service,withTax:!!r.with_tax,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at}}
+  menuType:r.menu_type||"",items:r.items||[],pricePerPax:r.price_per_pax||0,total:r.total||0,withService:!!r.with_service,withTax:!!r.with_tax,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at,cancelledAt:r.cancelled_at||"",cancelReason:r.cancel_reason||""}}
 function toRow(b){return{company:b.company||null,customer:b.customer,pic:b.pic||null,phone:b.phone||null,email:b.email||null,
   event_date:b.eventDate||null,start_time:b.startTime||null,end_time:b.endTime||null,pax:b.pax||0,area:b.area||null,event_name:b.eventName||null,setup:b.setup||null,
   status:b.status,dp_needed:!!b.dpNeeded,dp_amount:b.dpAmount||0,dp_date:b.dpDate||null,dp_received:!!b.dpReceived,dp_link:b.dpLink||null,dp_proof_path:b.dpProofPath||null,
@@ -567,7 +590,9 @@ function renderChips(){
 }
 function visible(){
   const t=today(),q=filter.q.toLowerCase();
+  if(filter.period==="cancelled")return bookings.filter(b=>b.cancelledAt&&(!q||[b.company,b.customer,b.pic,b.phone,b.eventName,b.cancelReason].join(" ").toLowerCase().includes(q))).sort((a,b)=>b.cancelledAt.localeCompare(a.cancelledAt));
   return bookings.filter(b=>{
+    if(b.cancelledAt)return false;
     if(filter.period==="upcoming"&&b.eventDate&&b.eventDate<t)return false;
     if(filter.period==="past"&&!(b.eventDate&&b.eventDate<t))return false;
     if(filter.status==="dpdue"){const s=dpState(b);if(!s||s.cls!=="due")return false}
@@ -577,7 +602,7 @@ function visible(){
   }).sort((a,b)=>filter.period==="past"?(b.eventDate||"").localeCompare(a.eventDate||""):(a.eventDate||"9").localeCompare(b.eventDate||"9"));
 }
 function render(){
-  const t=today(),up=bookings.filter(b=>!b.eventDate||b.eventDate>=t);
+  const t=today(),active=bookings.filter(b=>!b.cancelledAt),up=active.filter(b=>!b.eventDate||b.eventDate>=t);
   const cnt=s=>up.filter(b=>b.status===s).length;
   const paxConf=up.filter(b=>b.status==="confirmed").reduce((a,b)=>a+(+b.pax||0),0);
   const dpDue=up.filter(b=>{const s=dpState(b);return s&&s.cls==="due"}).length;
@@ -585,8 +610,26 @@ function render(){
     [cnt("early"),"Early","var(--early)"],[cnt("negotiation"),"Negotiation","var(--nego)"],[cnt("confirmed"),"Confirmed","var(--conf)"],
     [paxConf.toLocaleString("id-ID"),"Pax confirmed mendatang",""],[dpDue,"DP belum masuk","var(--warn)"]
   ].map(([n,l,c])=>`<div class="stat"><b>${n}</b><span>${c?`<i class="dot" style="background:${c}"></i>`:""}${l}</span></div>`).join("");
-  const list=$("#list"),rows=visible();
-  if(!bookings.length){
+  const list=$("#list"),rows=visible(),isCx=filter.period==="cancelled";
+  const nCx=bookings.length-active.length;
+  const opt=$("#period").querySelector('option[value="cancelled"]');opt.textContent="Dibatalkan / dihapus"+(nCx?` (${nCx})`:"");
+  $("#chips").hidden=isCx;
+  const pot=rows.reduce((a,b)=>a+bTotal(b),0);
+  $("#sumbar").innerHTML=isCx?`<span>${rows.length} booking dibatalkan / dihapus</span><span>Nilai yang batal: <b style="color:var(--muted)">${pot?rp(pot):"Rp 0"}</b></span>`
+    :`<span>${rows.length} booking ditampilkan · ${({upcoming:"event mendatang",all:"semua tanggal",past:"sudah lewat"})[filter.period]}${filter.status!=="all"?" · filter "+(filter.status==="dpdue"?"DP belum masuk":STATUS[filter.status].label):""}</span><span>Potensi total: <b>${pot?rp(pot):"Rp 0"}</b></span>`;
+  $("#sumbar").hidden=!bookings.length;
+  if(isCx){
+    if(!rows.length){list.innerHTML=`<div class="empty"><h3>Tidak ada booking yang dibatalkan</h3><p>Booking yang dibatalkan atau dihapus akan muncul di sini beserta alasannya.</p></div>`;return}
+    list.innerHTML=rows.map(b=>{const d=parseD(b.eventDate),c=new Date(b.cancelledAt);
+      return `<div class="row cx" data-cx="${b.id}">
+      <div class="date">${d?`<b>${d.getDate()}</b><span>${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</span>`:`<span>Tgl ?</span>`}</div>
+      <div class="who"><h3>${esc(b.company||b.customer)||"(Tanpa nama)"}</h3><p>${b.company?esc(b.customer||"-")+" · ":""}${esc(b.phone||"-")} · ${STATUS[b.status]?.label||""}</p></div>
+      <div class="pax"><b>${+b.pax||0}</b><span>pax</span>${amtHtml(b)}</div>
+      <div class="menu"><span style="white-space:normal">Dibatalkan ${c.getDate()} ${MONTHS[c.getMonth()]} ${c.getFullYear()}</span><div class="reason">${b.cancelReason?esc(b.cancelReason):'<span class="hint">Tanpa alasan</span>'}</div></div>
+      <div class="acts">${can.editAll()?`<button class="btn sm" type="button" data-restore>Pulihkan</button>`:""}${can.remove()?`<button class="btn sm ghost danger" type="button" data-purge>Hapus permanen</button>`:""}</div>
+    </div>`}).join("");return;
+  }
+  if(!active.length){
     list.innerHTML=`<div class="empty"><h3>Belum ada booking corporate</h3><p>Setiap inquiry event masuk dicatat di sini, dari tahap Early sampai Confirmed.<br>BEO bisa dibuat dari booking mana pun.</p>${can.create()?`<button class="btn primary" type="button" data-new>+ Catat booking pertama</button>`:""}</div>`;return;
   }
   if(!rows.length){list.innerHTML=`<div class="empty"><h3>Tidak ada booking yang cocok</h3><p>Ubah filter status, periode, atau kata pencarian.</p></div>`;return}
@@ -597,7 +640,7 @@ function render(){
     return `<div class="row${past?" past":""}">
       <div class="date">${d?`<b>${d.getDate()}</b><span>${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</span>`:`<span>Tgl ?</span>`}</div>
       <div class="who"><h3>${esc(b.company||b.customer)||"(Tanpa nama)"}</h3><p>${b.company?esc(b.customer||"-"):"Perorangan / tanpa perusahaan"}${b.pic&&b.pic!==b.customer?" · PIC "+esc(b.pic):""} · ${esc(b.phone||"-")}${b.startTime?" · "+esc(b.startTime)+(b.endTime?"–"+esc(b.endTime):""):""}</p></div>
-      <div class="pax"><b>${+b.pax||0}</b><span>pax</span></div>
+      <div class="pax"><b>${+b.pax||0}</b><span>pax</span>${amtHtml(b)}</div>
       <div class="menu"><b>${esc(b.menuType||"-")}</b><span title="${esc(items.join(", "))}">${items.length?esc(items.join(", ")):"Menu belum dipilih"}</span></div>
       <div class="st">
         <select class="pill ${b.status}" data-status="${b.id}" aria-label="Ubah status"${editable?"":" disabled"}>${Object.entries(STATUS).map(([k,v])=>`<option value="${k}"${k===b.status?" selected":""}>${v.label}</option>`).join("")}</select>
@@ -656,22 +699,25 @@ function openForm(b){
   pendingProof=f.dpProofPath||null;renderProof();
   const items=$("#items");items.innerHTML="";(f.items&&f.items.length?f.items:(can.editAll()?[{},{}]:[])).forEach(i=>items.appendChild(itemRow(i)));
   $("#upload-hint").textContent="Foto atau PDF, maks 20 MB.";
-  $("#del-zone").innerHTML=b&&can.remove()?`<button class="btn sm ghost danger" type="button" id="del">Hapus booking</button>`:"";
-  if($("#del"))$("#del").onclick=askDelete;
+  $("#del-zone").innerHTML=b&&can.editAll()?`<button class="btn sm ghost danger" type="button" id="del">Batalkan / hapus booking</button>`:"";
+  if($("#del"))$("#del").onclick=()=>openCancel(editing);
   syncDp();lockForm();
   $("#scrim").hidden=false;$("#sheet").hidden=false;
 }
-function askDelete(){
-  $("#del-zone").innerHTML=`<span>Hapus booking ini permanen?</span><button class="btn sm danger" type="button" id="del-yes">Ya, hapus</button><button class="btn sm ghost" type="button" id="del-no">Tidak</button>`;
-  $("#del-no").onclick=()=>{$("#del-zone").innerHTML=`<button class="btn sm ghost danger" type="button" id="del">Hapus booking</button>`;$("#del").onclick=askDelete};
-  $("#del-yes").onclick=async()=>{
-    const {error}=await sb.from("bookings").delete().eq("id",editing.id);
-    if(error){toast("Gagal menghapus: "+error.message);return}
-    if(editing.dpProofPath)await sb.storage.from("dp-proofs").remove([editing.dpProofPath]);
-    closeAll();toast("Booking dihapus");loadBookings();
-  };
+let cancelTarget=null;
+function openCancel(b){
+  cancelTarget=b;$("#cancel-who").innerHTML=`<b>${esc(b.company||b.customer)}</b> · ${shortDate(b.eventDate)} · ${+b.pax||0} pax`;
+  $("#cancel-reason").value="";$("#cancel").hidden=false;$("#cancel-reason").focus();
 }
-function closeAll(){["#scrim","#sheet","#beo","#users"].forEach(s=>$(s).hidden=true);editing=null;beoBooking=null}
+$("#cancel-no").onclick=()=>{$("#cancel").hidden=true;cancelTarget=null};
+$("#cancel-yes").onclick=async()=>{
+  if(!cancelTarget)return;const btn=$("#cancel-yes");btn.disabled=true;
+  const {error}=await sb.from("bookings").update({cancelled_at:new Date().toISOString(),cancel_reason:$("#cancel-reason").value.trim()||null}).eq("id",cancelTarget.id);
+  btn.disabled=false;
+  if(error){toast("Gagal membatalkan: "+error.message);return}
+  $("#cancel").hidden=true;cancelTarget=null;closeAll();toast("Booking dipindah ke daftar Dibatalkan / dihapus");loadBookings();
+};
+function closeAll(){["#scrim","#sheet","#beo","#users","#cancel"].forEach(s=>$(s).hidden=true);editing=null;beoBooking=null}
 
 $("#f-dpfile").addEventListener("change",async e=>{
   const file=e.target.files[0];if(!file)return;
@@ -820,7 +866,7 @@ document.querySelectorAll('input[name="status"],input[name="dpneed"]').forEach(r
 ["#f-dpamount","#f-price"].forEach(id=>$(id).addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}));
 $("#scrim").onclick=closeAll;
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeAll);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#scrim").hidden)closeAll()});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#cancel").hidden){$("#cancel").hidden=true;cancelTarget=null;return}if(!$("#scrim").hidden)closeAll()});
 $("#q").addEventListener("input",e=>{filter.q=e.target.value;render()});
 $("#period").addEventListener("change",e=>{filter.period=e.target.value;render()});
 $("#chips").addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c)return;filter.status=c.dataset.v;renderChips();render()});
@@ -830,6 +876,20 @@ $("#list").addEventListener("click",e=>{
   const find=id=>bookings.find(b=>b.id===id);
   if(t.dataset.edit)openForm(find(t.dataset.edit));
   if(t.dataset.beo)openBeo(find(t.dataset.beo));
+  const cx=t.closest("[data-cx]");if(!cx)return;const b=find(cx.dataset.cx);const acts=cx.querySelector(".acts");
+  if(t.dataset.restore!==undefined){
+    sb.from("bookings").update({cancelled_at:null,cancel_reason:null}).eq("id",b.id).then(({error})=>{if(error){toast("Gagal memulihkan: "+error.message);return}toast("Booking dipulihkan");loadBookings()});
+  }
+  if(t.dataset.purge!==undefined){acts.innerHTML=`<span class="hint">Hapus permanen? Tidak bisa dibatalkan.</span><button class="btn sm danger" type="button" data-purgeyes>Ya, hapus</button><button class="btn sm ghost" type="button" data-purgeno>Batal</button>`}
+  if(t.dataset.purgeno!==undefined)render();
+  if(t.dataset.purgeyes!==undefined){
+    t.disabled=true;
+    sb.from("bookings").delete().eq("id",b.id).then(async({error})=>{
+      if(error){toast("Gagal menghapus: "+error.message);render();return}
+      if(b.dpProofPath)await sb.storage.from("dp-proofs").remove([b.dpProofPath]);
+      toast("Booking dihapus permanen");loadBookings();
+    });
+  }
 });
 $("#list").addEventListener("change",async e=>{
   const s=e.target.closest("select[data-status]");if(!s)return;
