@@ -354,7 +354,7 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
         <div class="f"><span class="lbl">Tambahan</span>
           <div class="checks">
             <label class="check"><input type="checkbox" id="f-svc"> Service charge 7%</label>
-            <label class="check"><input type="checkbox" id="f-tax"> Pajak 11%</label>
+            <label class="check"><input type="checkbox" id="f-tax"> Pajak 10%</label>
           </div>
         </div>
       </div>
@@ -476,12 +476,12 @@ function longDate(s){const d=parseD(s);return d?`${DAYS[d.getDay()]}, ${d.getDat
 function shortDate(s){const d=parseD(s);return d?`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`:"-"}
 function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600)}
 function showErr(el,msg){el.textContent=msg;el.hidden=!msg}
-function calcTotals(price,pax,svc,tax){const sub=(+price||0)*(+pax||0);const s=svc?Math.round(sub*0.07):0;const t=tax?Math.round((sub+s)*0.11):0;return{sub,svc:s,tax:t,total:sub+s+t}}
+function calcTotals(price,pax,svc,tax){const sub=(+price||0)*(+pax||0);const s=svc?Math.round(sub*0.07):0;const t=tax?Math.round((sub+s)*0.10):0;return{sub,svc:s,tax:t,total:sub+s+t}}
 function renderCalc(){
   const c=calcTotals(num($("#f-price").value),num($("#f-pax").value),$("#f-svc").checked,$("#f-tax").checked);
   $("#calc").innerHTML=`<div><span>Subtotal (harga × ${num($("#f-pax").value)} pax)</span><b>${rp(c.sub)}</b></div>`+
     ($("#f-svc").checked?`<div><span>Service charge 7%</span><b>${rp(c.svc)}</b></div>`:"")+
-    ($("#f-tax").checked?`<div><span>Pajak 11%${$("#f-svc").checked?" (dari subtotal + service)":""}</span><b>${rp(c.tax)}</b></div>`:"")+
+    ($("#f-tax").checked?`<div><span>Pajak 10%${$("#f-svc").checked?" (dari subtotal + service)":""}</span><b>${rp(c.tax)}</b></div>`:"")+
     `<div class="tot"><span>Estimasi total</span><b>${rp(c.total)}</b></div>`;
 }
 function beoNo(b){return "BEO-RR-"+(b.eventDate||"").replace(/-/g,"")+"-"+String(b.id||"").slice(0,4).toUpperCase()}
@@ -731,7 +731,7 @@ function buildBeo(b,wa){
   L.push("");L.push(H("SPECIAL REQUEST"));L.push(b.special||"-");L.push("");
   L.push(H("PEMBAYARAN"));{const c=calcTotals(b.pricePerPax||0,b.pax||0,b.withService,b.withTax);
   L.push(`Harga/pax : ${rp(b.pricePerPax)}`);L.push(`Subtotal  : ${rp(c.sub)} (${b.pax||0} pax)`);
-  if(b.withService)L.push(`Service 7%: ${rp(c.svc)}`);if(b.withTax)L.push(`Pajak 11% : ${rp(c.tax)}`);
+  if(b.withService)L.push(`Service 7%: ${rp(c.svc)}`);if(b.withTax)L.push(`Pajak 10% : ${rp(c.tax)}`);
   L.push(`Total     : ${rp(c.total)}${!b.withService&&!b.withTax?" (belum termasuk service & pajak)":""}`);}
   if(b.status==="confirmed"){
     if(!b.dpNeeded)L.push("DP        : Tanpa DP");
