@@ -147,6 +147,14 @@ label.f textarea{height:auto;min-height:84px;padding:9px 11px;resize:vertical;li
 .proof:empty{display:none}
 .proof img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
 .hint{font-size:12px;color:var(--muted);margin:0}
+div.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.checks{display:flex;gap:4px 16px;flex-wrap:wrap;min-height:40px;align-items:center}
+.checks .check{min-height:0}
+.calc{border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:12px 14px;display:grid;gap:6px;font-size:13px;font-variant-numeric:tabular-nums}
+.calc div{display:flex;justify-content:space-between;gap:12px}
+.calc span{color:var(--muted)}
+.calc .tot{border-top:1px solid var(--line);padding-top:8px;margin-top:2px;font-weight:600;font-size:15px}
+.calc .tot span{color:var(--ink)}
 .confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px}
 
 /* BEO modal */
@@ -343,8 +351,14 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
       </div>
       <div class="grid2">
         <label class="f"><span class="lbl">Harga per pax (Rp)</span><input id="f-price" inputmode="numeric" placeholder="0"></label>
-        <label class="f"><span class="lbl">Estimasi total (Rp)</span><input id="f-total" inputmode="numeric" placeholder="Otomatis: harga × pax"></label>
+        <div class="f"><span class="lbl">Tambahan</span>
+          <div class="checks">
+            <label class="check"><input type="checkbox" id="f-svc"> Service charge 7%</label>
+            <label class="check"><input type="checkbox" id="f-tax"> Pajak 11%</label>
+          </div>
+        </div>
       </div>
+      <div class="calc" id="calc" aria-live="polite"></div>
     </section>
 
     <section class="sec">
@@ -462,6 +476,14 @@ function longDate(s){const d=parseD(s);return d?`${DAYS[d.getDay()]}, ${d.getDat
 function shortDate(s){const d=parseD(s);return d?`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`:"-"}
 function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600)}
 function showErr(el,msg){el.textContent=msg;el.hidden=!msg}
+function calcTotals(price,pax,svc,tax){const sub=(+price||0)*(+pax||0);const s=svc?Math.round(sub*0.07):0;const t=tax?Math.round((sub+s)*0.11):0;return{sub,svc:s,tax:t,total:sub+s+t}}
+function renderCalc(){
+  const c=calcTotals(num($("#f-price").value),num($("#f-pax").value),$("#f-svc").checked,$("#f-tax").checked);
+  $("#calc").innerHTML=`<div><span>Subtotal (harga × ${num($("#f-pax").value)} pax)</span><b>${rp(c.sub)}</b></div>`+
+    ($("#f-svc").checked?`<div><span>Service charge 7%</span><b>${rp(c.svc)}</b></div>`:"")+
+    ($("#f-tax").checked?`<div><span>Pajak 11%${$("#f-svc").checked?" (dari subtotal + service)":""}</span><b>${rp(c.tax)}</b></div>`:"")+
+    `<div class="tot"><span>Estimasi total</span><b>${rp(c.total)}</b></div>`;
+}
 function beoNo(b){return "BEO-RR-"+(b.eventDate||"").replace(/-/g,"")+"-"+String(b.id||"").slice(0,4).toUpperCase()}
 function dpState(b){
   if(b.status!=="confirmed")return null;
@@ -474,11 +496,11 @@ function dpState(b){
 function fromRow(r){return{id:r.id,company:r.company||"",customer:r.customer||"",pic:r.pic||"",phone:r.phone||"",email:r.email||"",
   eventDate:r.event_date||"",startTime:r.start_time||"",endTime:r.end_time||"",pax:r.pax||0,area:r.area||"",eventName:r.event_name||"",setup:r.setup||"",
   status:r.status,dpNeeded:r.dp_needed,dpAmount:r.dp_amount||0,dpDate:r.dp_date||"",dpReceived:r.dp_received,dpLink:r.dp_link||"",dpProofPath:r.dp_proof_path||"",
-  menuType:r.menu_type||"",items:r.items||[],pricePerPax:r.price_per_pax||0,total:r.total||0,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at}}
+  menuType:r.menu_type||"",items:r.items||[],pricePerPax:r.price_per_pax||0,total:r.total||0,withService:!!r.with_service,withTax:!!r.with_tax,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at}}
 function toRow(b){return{company:b.company||null,customer:b.customer,pic:b.pic||null,phone:b.phone||null,email:b.email||null,
   event_date:b.eventDate||null,start_time:b.startTime||null,end_time:b.endTime||null,pax:b.pax||0,area:b.area||null,event_name:b.eventName||null,setup:b.setup||null,
   status:b.status,dp_needed:!!b.dpNeeded,dp_amount:b.dpAmount||0,dp_date:b.dpDate||null,dp_received:!!b.dpReceived,dp_link:b.dpLink||null,dp_proof_path:b.dpProofPath||null,
-  menu_type:b.menuType||null,items:b.items||[],price_per_pax:b.pricePerPax||0,total:b.total||0,special:b.special||null,notes:b.notes||null}}
+  menu_type:b.menuType||null,items:b.items||[],price_per_pax:b.pricePerPax||0,total:b.total||0,with_service:!!b.withService,with_tax:!!b.withTax,special:b.special||null,notes:b.notes||null}}
 
 /* ---------- auth flow ---------- */
 function show(view){["#v-login","#v-pending","#v-app"].forEach(v=>$(v).hidden=v!==view)}
@@ -628,7 +650,7 @@ function openForm(b){
   set("#f-company",f.company);set("#f-customer",f.customer);set("#f-pic",f.pic);set("#f-phone",f.phone);set("#f-email",f.email);
   set("#f-date",f.eventDate);set("#f-start",f.startTime);set("#f-end",f.endTime);set("#f-pax",f.pax||"");set("#f-area",f.area);set("#f-eventname",f.eventName);set("#f-setup",f.setup);
   set("#f-dpamount",f.dpAmount?Number(f.dpAmount).toLocaleString("id-ID"):"");set("#f-dpdate",f.dpDate);$("#f-dpreceived").checked=!!f.dpReceived;set("#f-dplink",f.dpLink);
-  set("#f-price",f.pricePerPax?Number(f.pricePerPax).toLocaleString("id-ID"):"");set("#f-total",f.total?Number(f.total).toLocaleString("id-ID"):"");
+  set("#f-price",f.pricePerPax?Number(f.pricePerPax).toLocaleString("id-ID"):"");$("#f-svc").checked=!!f.withService;$("#f-tax").checked=!!f.withTax;renderCalc();
   set("#f-special",f.special);set("#f-notes",f.notes);
   setRadio("status",f.status||"early");setRadio("dpneed",f.dpNeeded===false?"no":"yes");setRadio("menutype",f.menuType||"Prasmanan");
   pendingProof=f.dpProofPath||null;renderProof();
@@ -674,7 +696,7 @@ $("#form").addEventListener("submit",async e=>{
     company:$("#f-company").value.trim(),customer:$("#f-customer").value.trim(),pic:$("#f-pic").value.trim(),phone:$("#f-phone").value.trim(),email:$("#f-email").value.trim(),
     eventDate:$("#f-date").value,startTime:$("#f-start").value,endTime:$("#f-end").value,pax,area:$("#f-area").value.trim(),eventName:$("#f-eventname").value.trim(),setup:$("#f-setup").value.trim(),
     status,dpNeeded:status==="confirmed"?dpNeeded:true,dpAmount:num($("#f-dpamount").value),dpDate:$("#f-dpdate").value,dpReceived:$("#f-dpreceived").checked,dpLink:$("#f-dplink").value.trim(),
-    dpProofPath:pendingProof||"",menuType:getRadio("menutype"),items,pricePerPax:price,total:num($("#f-total").value)||price*pax,
+    dpProofPath:pendingProof||"",menuType:getRadio("menutype"),items,pricePerPax:price,withService:$("#f-svc").checked,withTax:$("#f-tax").checked,total:calcTotals(price,pax,$("#f-svc").checked,$("#f-tax").checked).total,
     special:$("#f-special").value.trim(),notes:$("#f-notes").value.trim()
   };
   if(!b.customer&&editing)b.customer=editing.customer;
@@ -707,7 +729,10 @@ function buildBeo(b,wa){
   if(items.length)items.forEach((i,n)=>L.push(`${n+1}. ${i.name}${i.qty?" — "+i.qty+(/^\d+$/.test(i.qty)?" porsi":""):""}${i.note?" ("+i.note+")":""}`));
   else L.push("Menu belum ditentukan");
   L.push("");L.push(H("SPECIAL REQUEST"));L.push(b.special||"-");L.push("");
-  L.push(H("PEMBAYARAN"));L.push(`Harga/pax : ${rp(b.pricePerPax)}`);L.push(`Estimasi  : ${rp(b.total)}`);
+  L.push(H("PEMBAYARAN"));{const c=calcTotals(b.pricePerPax||0,b.pax||0,b.withService,b.withTax);
+  L.push(`Harga/pax : ${rp(b.pricePerPax)}`);L.push(`Subtotal  : ${rp(c.sub)} (${b.pax||0} pax)`);
+  if(b.withService)L.push(`Service 7%: ${rp(c.svc)}`);if(b.withTax)L.push(`Pajak 11% : ${rp(c.tax)}`);
+  L.push(`Total     : ${rp(c.total)}${!b.withService&&!b.withTax?" (belum termasuk service & pajak)":""}`);}
   if(b.status==="confirmed"){
     if(!b.dpNeeded)L.push("DP        : Tanpa DP");
     else L.push(`DP        : ${rp(b.dpAmount)} – ${b.dpReceived?"SUDAH DITERIMA"+(b.dpDate?" ("+shortDate(b.dpDate)+")":""):"BELUM DITERIMA"}`);
@@ -789,9 +814,10 @@ $("#u-list").addEventListener("click",async e=>{
 
 /* ---------- events ---------- */
 $("#btn-new").onclick=()=>openForm(null);
+["#f-price","#f-pax"].forEach(id=>$(id).addEventListener("input",renderCalc));["#f-svc","#f-tax"].forEach(id=>$(id).addEventListener("change",renderCalc));
 $("#add-item").onclick=()=>{const r=itemRow();$("#items").appendChild(r);r.querySelector(".nm").focus()};
 document.querySelectorAll('input[name="status"],input[name="dpneed"]').forEach(r=>r.addEventListener("change",syncDp));
-["#f-dpamount","#f-price","#f-total"].forEach(id=>$(id).addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}));
+["#f-dpamount","#f-price"].forEach(id=>$(id).addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}));
 $("#scrim").onclick=closeAll;
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeAll);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#scrim").hidden)closeAll()});
