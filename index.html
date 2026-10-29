@@ -168,17 +168,17 @@ label.f textarea{height:auto;min-height:84px;padding:9px 11px;resize:vertical;li
 @media (max-width:560px){.acrow,.achead{grid-template-columns:minmax(0,1fr) 52px 96px 36px}}
 select.inp{appearance:auto;padding-right:6px;text-overflow:ellipsis}
 .menu-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.newmenu{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.9fr) auto;gap:8px;align-items:end;border:1px solid var(--accent);border-radius:8px;padding:12px;background:var(--accent-soft)}
+.newmenu{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end;border:1px solid var(--accent);border-radius:8px;padding:12px;background:var(--accent-soft)}
 .newmenu .inp{background:var(--surface)}
-@media (max-width:560px){.newmenu{grid-template-columns:1fr 1fr}.newmenu .acts2{grid-column:1/-1}}
-.mrow{display:grid;grid-template-columns:minmax(0,1fr) 110px 120px auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+@media (max-width:560px){.newmenu{grid-template-columns:minmax(0,1fr)}}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .mrow:last-child{border-bottom:0}
 .mrow.off{opacity:.5}
 .mrow .nm{font-weight:600;overflow-wrap:anywhere}
 .mrow .price{text-align:right;font-variant-numeric:tabular-nums}
 .mrow .acts{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
-.mrow.edit{grid-template-columns:minmax(0,1fr) 120px 120px auto}
-@media (max-width:560px){.mrow,.mrow.edit{grid-template-columns:minmax(0,1fr) auto}.mrow .cat{display:none}.mrow.edit .cat{display:block}.mrow .acts{grid-column:1/-1;justify-content:flex-start}}
+.mrow.edit{grid-template-columns:minmax(0,1fr) auto}
+@media (max-width:560px){.mrow .acts{grid-column:1/-1;justify-content:flex-start}.mrow{grid-template-columns:minmax(0,1fr)}}
 .cat-pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunken);color:var(--muted);justify-self:start}
 .cat-pill.alacarte{background:var(--accent-soft);color:var(--accent)}
 .ots-note{font-size:13px;color:var(--muted);background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:12px 14px;margin:0}
@@ -286,7 +286,7 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
     </div>
     <div class="userbar">
       <span class="me"><span id="me-name"></span><span class="role" id="me-role"></span></span>
-      <button class="btn" id="btn-menus" type="button" hidden>Daftar menu</button>
+      <button class="btn" id="btn-menus" type="button" hidden>Daftar menu prasmanan</button>
       <button class="btn" id="btn-users" type="button" hidden>Kelola akses</button>
       <button class="btn primary" id="btn-new" type="button" hidden>+ Booking baru</button>
       <button class="btn ghost" type="button" data-logout>Keluar</button>
@@ -402,12 +402,10 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
         </div>
         <div class="menu-tools">
           <button class="btn sm" type="button" id="ac-add">+ Tambah menu à la carte</button>
-          <button class="btn sm ghost" type="button" id="nm-open">+ Menu baru ke daftar</button>
+          <button class="btn sm ghost" type="button" id="nm-open">+ Menu prasmanan baru</button>
         </div>
         <div class="newmenu" id="nm-box" hidden>
-          <label class="f"><span class="lbl">Nama menu baru</span><input class="inp" id="nm-name" placeholder="Contoh: Ayam bakar madu"></label>
-          <label class="f"><span class="lbl">Kategori</span><select class="inp" id="nm-cat"><option value="prasmanan">Prasmanan</option><option value="alacarte">À la carte</option></select></label>
-          <label class="f"><span class="lbl">Harga (Rp)</span><input class="inp" id="nm-price" inputmode="numeric" placeholder="0"></label>
+          <label class="f"><span class="lbl">Nama menu prasmanan baru</span><input class="inp" id="nm-name" placeholder="Contoh: Ayam bakar madu"></label>
           <div class="acts2" style="display:flex;gap:6px"><button class="btn sm primary" type="button" id="nm-save">Simpan</button><button class="btn sm ghost" type="button" id="nm-cancel">Batal</button></div>
           <p class="err" id="nm-err" hidden style="grid-column:1/-1"></p>
         </div>
@@ -512,19 +510,15 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
 
 <aside class="sheet" id="menus" hidden aria-labelledby="menus-title">
   <header>
-    <h2 id="menus-title">Daftar menu</h2>
+    <h2 id="menus-title">Daftar menu prasmanan</h2>
     <button class="btn ghost" type="button" data-close>Tutup</button>
   </header>
   <div class="body">
     <section class="sec" id="mm-add-sec">
       <div class="sec-h"><h3>Tambah menu</h3></div>
       <form id="mm-form" onsubmit="return false" autocomplete="off" style="display:flex;flex-direction:column;gap:12px">
-        <div class="grid3">
-          <label class="f"><span class="lbl">Nama menu<span class="req">*</span></span><input id="mm-name" required></label>
-          <label class="f"><span class="lbl">Kategori</span><select id="mm-cat" class="inp"><option value="prasmanan">Prasmanan</option><option value="alacarte">À la carte</option></select></label>
-          <label class="f"><span class="lbl">Harga (Rp)</span><input id="mm-price" inputmode="numeric" placeholder="0"></label>
-        </div>
-        <p class="hint">Harga dipakai otomatis untuk Pre-Order dan tambahan à la carte. Menu prasmanan boleh tanpa harga.</p>
+        <label class="f"><span class="lbl">Nama menu<span class="req">*</span></span><input id="mm-name" required placeholder="Contoh: Ayam bakar madu"></label>
+        <p class="hint">Menu ini muncul di pilihan dropdown untuk booking Prasmanan. Menu Pre-Order dan à la carte cukup diketik langsung di booking.</p>
         <p class="err" id="mm-err" hidden></p>
         <div><button class="btn primary" type="submit" id="mm-btn">Tambah menu</button></div>
       </form>
@@ -760,48 +754,62 @@ function render(){
 /* ---------- booking form ---------- */
 function setRadio(name,val){const el=document.querySelector(`input[name="${name}"][value="${val}"]`);if(el)el.checked=true}
 function getRadio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value}
-function menuOptions(selected,prefer){
-  const order=prefer==="alacarte"?["alacarte","prasmanan"]:["prasmanan","alacarte"];
+function menuOptions(selected){
   const sel=(selected||"").trim(),selL=sel.toLowerCase();
+  const list=menus.filter(m=>m.category==="prasmanan"&&(m.active||m.name.toLowerCase()===selL));
   let found=false,html=`<option value="">Pilih menu…</option>`;
-  order.forEach(cat=>{
-    const list=menus.filter(m=>m.category===cat&&(m.active||m.name.toLowerCase()===selL));
-    if(!list.length)return;
-    html+=`<optgroup label="${CAT_LABEL[cat]}">`+list.map(m=>{const on=m.name.toLowerCase()===selL;if(on)found=true;
-      return `<option value="${esc(m.name)}" data-price="${m.price||0}"${on?" selected":""}>${esc(m.name)}${m.price?" — "+rp(m.price):""}</option>`}).join("")+`</optgroup>`;
-  });
-  if(sel&&!found)html+=`<optgroup label="Tidak ada di daftar"><option value="${esc(sel)}" selected>${esc(sel)}</option></optgroup>`;
-  if(!menus.length)html+=`<option value="" disabled>Daftar menu masih kosong</option>`;
+  html+=list.map(m=>{const on=m.name.toLowerCase()===selL;if(on)found=true;return `<option value="${esc(m.name)}"${on?" selected":""}>${esc(m.name)}</option>`}).join("");
+  if(sel&&!found)html+=`<option value="${esc(sel)}" selected>${esc(sel)} (tidak ada di daftar)</option>`;
+  if(!list.length)html+=`<option value="" disabled>Daftar menu prasmanan masih kosong</option>`;
   return html;
+}
+const isPO=()=>getRadio("menutype")===PO;
+function nameField(it,label,typed){
+  return typed?`<input class="inp nm" placeholder="Ketik nama menu" value="${esc(it.name)}" aria-label="${label}">`
+              :`<select class="inp nm" aria-label="${label}">${menuOptions(it.name)}</select>`;
 }
 function itemRow(it={}){
   const div=document.createElement("div");div.className="item";
-  div.innerHTML=`<select class="inp nm" aria-label="Nama menu">${menuOptions(it.name,getRadio("menutype")===PO?"alacarte":"prasmanan")}</select><input class="inp qt" placeholder="Qty" inputmode="numeric" value="${esc(it.qty)}" aria-label="Jumlah"><input class="inp pr" placeholder="Rp" inputmode="numeric" value="${it.price?Number(it.price).toLocaleString("id-ID"):""}" aria-label="Harga per item"><input class="inp note" placeholder="Catatan" value="${esc(it.note)}" aria-label="Catatan menu"><button type="button" class="x" aria-label="Hapus menu">×</button>`;
-  div.querySelector(".x").onclick=()=>{div.remove();ensureTrailingRow();renderCalc()};
-  div.querySelector(".x").hidden=!can.editAll();
+  div.innerHTML=nameField(it,"Nama menu",isPO())+`<input class="inp qt" placeholder="Qty" inputmode="numeric" value="${esc(it.qty)}" aria-label="Jumlah"><input class="inp pr" placeholder="Rp" inputmode="numeric" value="${it.price?Number(it.price).toLocaleString("id-ID"):""}" aria-label="Harga per item"><input class="inp note" placeholder="Catatan" value="${esc(it.note)}" aria-label="Catatan menu"><button type="button" class="x" aria-label="Hapus menu">×</button>`;
   return div;
 }
 function acRow(it={}){
   const div=document.createElement("div");div.className="acrow";
-  div.innerHTML=`<select class="inp nm" aria-label="Menu à la carte">${menuOptions(it.name,"alacarte")}</select><input class="inp qt" placeholder="Qty" inputmode="numeric" value="${esc(it.qty)}" aria-label="Qty"><input class="inp pr" placeholder="Rp" inputmode="numeric" value="${it.price?Number(it.price).toLocaleString("id-ID"):""}" aria-label="Harga per item"><button type="button" class="x" aria-label="Hapus">×</button>`;
-  div.querySelector(".x").onclick=()=>{div.remove();ensureTrailingRow("#ac-items");renderCalc()};
-  div.querySelector(".x").hidden=!can.editAll();
+  div.innerHTML=nameField(it,"Menu à la carte",true)+`<input class="inp qt" placeholder="Qty" inputmode="numeric" value="${esc(it.qty)}" aria-label="Qty"><input class="inp pr" placeholder="Rp" inputmode="numeric" value="${it.price?Number(it.price).toLocaleString("id-ID"):""}" aria-label="Harga per item"><button type="button" class="x" aria-label="Hapus">×</button>`;
   return div;
 }
+const rowCls=box=>box==="#items"?".item":".acrow";
+function syncRowX(box){
+  const rows=[...document.querySelectorAll(box+" "+rowCls(box))];
+  rows.forEach((r,i)=>{const x=r.querySelector(".x");const empty=!r.querySelector(".nm").value.trim();
+    /* trailing empty row has no × (it is the auto row), except in à la carte where × on the only row closes the section */
+    x.hidden=!can.editAll()||(empty&&i===rows.length-1&&!(box==="#ac-items"&&rows.length===1))});
+}
 function ensureTrailingRow(box="#items"){
-  if(!can.editAll())return;
-  const cls=box==="#items"?".item":".acrow";
-  const rows=[...document.querySelectorAll(box+" "+cls)],last=rows[rows.length-1];
+  if(!can.editAll()){syncRowX(box);return}
+  const rows=[...document.querySelectorAll(box+" "+rowCls(box))],last=rows[rows.length-1];
   if(!last||last.querySelector(".nm").value.trim())$(box).appendChild(box==="#items"?itemRow():acRow());
+  syncRowX(box);
+}
+function removeRow(row,box){
+  row.remove();
+  if(box==="#ac-items"&&!readAcAll().length){closeAc();return}
+  ensureTrailingRow(box);renderCalc();
+}
+function closeAc(){$("#ac-items").innerHTML="";$("#ac-wrap").hidden=true;$("#ac-add").hidden=!can.editAll()||getRadio("menutype")!=="Prasmanan";renderCalc()}
+function rebuildItems(){
+  /* switch name field between dropdown (Prasmanan) and typed (Pre-Order), keeping what was entered */
+  const cur=[...document.querySelectorAll("#items .item")].map(r=>({name:r.querySelector(".nm").value.trim(),qty:r.querySelector(".qt").value.trim(),price:num(r.querySelector(".pr").value),note:r.querySelector(".note").value.trim()})).filter(i=>i.name||i.qty);
+  const box=$("#items");box.innerHTML="";cur.forEach(i=>box.appendChild(itemRow(i)));ensureTrailingRow("#items");
 }
 function refreshMenuSelects(){
-  document.querySelectorAll("#items .item .nm").forEach(sel=>{const v=sel.value;sel.innerHTML=menuOptions(v,getRadio("menutype")===PO?"alacarte":"prasmanan")});
-  document.querySelectorAll("#ac-items .acrow .nm").forEach(sel=>{const v=sel.value;sel.innerHTML=menuOptions(v,"alacarte")});
+  document.querySelectorAll("#items .item select.nm").forEach(sel=>{const v=sel.value;sel.innerHTML=menuOptions(v)});
 }
 function setAc(list){
   const box=$("#ac-items");box.innerHTML="";(list||[]).forEach(i=>box.appendChild(acRow(i)));
   $("#ac-wrap").hidden=!(list&&list.length);if(!$("#ac-wrap").hidden)ensureTrailingRow("#ac-items");
 }
+let lastMenuType=null;
 function syncMenuType(){
   const t=getRadio("menutype");
   $("#menu-wrap").hidden=t===OTS;$("#ots-note").hidden=t!==OTS;
@@ -810,8 +818,10 @@ function syncMenuType(){
   if(!isPras)$("#ac-wrap").hidden=true;
   else if(readAcAll().length)$("#ac-wrap").hidden=false;
   $("#ac-add").hidden=!isPras||!$("#ac-wrap").hidden||!can.editAll();
-  $("#nm-open").hidden=!can.menus();
-  refreshMenuSelects();
+  $("#nm-open").hidden=!isPras||!can.menus();if(!isPras)$("#nm-box").hidden=true;
+  const typed=!!document.querySelector("#items .item input.nm"),wantTyped=t===PO;
+  if(document.querySelector("#items .item")&&typed!==wantTyped)rebuildItems();else refreshMenuSelects();
+  $("#items-hint").textContent=t===PO?"Ketik nama menu. Baris baru otomatis muncul setelah baris terakhir diisi.":"Pilih menu dari daftar. Baris baru otomatis muncul setelah baris terakhir diisi.";
   $("#price-wrap").hidden=t===PO;
   $("#price-lbl").textContent=t===OTS?"Estimasi spend per pax (Rp)":"Harga per pax (Rp)";
   renderCalc();
@@ -837,7 +847,7 @@ function lockForm(){
     el.disabled=!(all||(dp&&isDp));
   });
   document.querySelectorAll("#form .seg").forEach(s=>{const isDp=!!s.querySelector('input[name="dpneed"]');s.classList.toggle("locked",!(all||(dp&&isDp)))});
-  $("#items-hint").hidden=!all;document.querySelectorAll("#items .x, #ac-items .x").forEach(x=>x.hidden=!all);
+  $("#items-hint").hidden=!all;syncRowX("#items");syncRowX("#ac-items");
   $("#ac-remove").hidden=!all;if(!all){$("#ac-add").hidden=true;$("#nm-open").hidden=true;$("#nm-box").hidden=true}
   $("#upload-btn").hidden=!dp;$("#upload-hint").hidden=!dp;
   $("#save-btn").hidden=!dp;
@@ -1029,39 +1039,35 @@ $("#u-list").addEventListener("click",async e=>{
 /* ---------- events ---------- */
 $("#btn-new").onclick=()=>openForm(null);
 ["#f-price","#f-pax"].forEach(id=>$(id).addEventListener("input",renderCalc));["#f-svc","#f-tax"].forEach(id=>$(id).addEventListener("change",renderCalc));
-function onMenuPick(e,box){
-  const sel=e.target;if(!sel.classList.contains("nm"))return;
-  const row=sel.closest(".item,.acrow"),pr=row.querySelector(".pr"),opt=sel.selectedOptions[0];
-  const p=num(opt&&opt.dataset.price);
-  if(pr&&p&&(box==="#ac-items"||getRadio("menutype")===PO))pr.value=p.toLocaleString("id-ID");
-  const qt=row.querySelector(".qt");
-  if(qt&&!qt.value.trim()&&sel.value){qt.value=box==="#items"&&getRadio("menutype")==="Prasmanan"&&num($("#f-pax").value)?num($("#f-pax").value):"1"}
+function onNameChange(e,box){
+  const el=e.target;if(!el.classList.contains("nm"))return;
+  const row=el.closest(".item,.acrow"),qt=row.querySelector(".qt");
+  if(el.tagName==="SELECT"&&qt&&!qt.value.trim()&&el.value&&num($("#f-pax").value))qt.value=num($("#f-pax").value);
   ensureTrailingRow(box);renderCalc();
 }
 ["#items","#ac-items"].forEach(box=>{
-  $(box).addEventListener("change",e=>onMenuPick(e,box));
-  $(box).addEventListener("input",e=>{if(e.target.matches(".qt,.pr"))renderCalc()});
+  $(box).addEventListener("change",e=>{if(e.target.tagName==="SELECT")onNameChange(e,box)});
+  $(box).addEventListener("input",e=>{if(e.target.matches("input.nm"))onNameChange(e,box);else if(e.target.matches(".qt,.pr"))renderCalc()});
   $(box).addEventListener("focusout",e=>{if(e.target.classList.contains("pr")){const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}});
+  $(box).addEventListener("click",e=>{const x=e.target.closest(".x");if(x)removeRow(x.closest(rowCls(box)),box)});
 });
 $("#ac-add").onclick=()=>{$("#ac-wrap").hidden=false;$("#ac-add").hidden=true;if(!document.querySelector("#ac-items .acrow"))$("#ac-items").appendChild(acRow());ensureTrailingRow("#ac-items");$("#ac-items .acrow .nm").focus();renderCalc()};
-$("#ac-remove").onclick=()=>{$("#ac-items").innerHTML="";$("#ac-wrap").hidden=true;$("#ac-add").hidden=!can.editAll();renderCalc()};
+$("#ac-remove").onclick=closeAc;
 /* quick add menu from booking form */
-$("#nm-open").onclick=()=>{$("#nm-box").hidden=false;$("#nm-cat").value=getRadio("menutype")===PO?"alacarte":"prasmanan";$("#nm-name").value="";$("#nm-price").value="";showErr($("#nm-err"),"");$("#nm-name").focus()};
+$("#nm-open").onclick=()=>{$("#nm-box").hidden=false;$("#nm-name").value="";showErr($("#nm-err"),"");$("#nm-name").focus()};
 $("#nm-cancel").onclick=()=>{$("#nm-box").hidden=true};
 $("#nm-box").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#nm-save").click()}});
-$("#nm-price").addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""});
 $("#nm-save").onclick=async()=>{
   const name=$("#nm-name").value.trim();if(!name){showErr($("#nm-err"),"Isi nama menu.");return}
-  const r=await addMenu(name,$("#nm-cat").value,num($("#nm-price").value));
+  const r=await addMenu(name);
   if(r.error){showErr($("#nm-err"),r.error);return}
   $("#nm-box").hidden=true;toast(`"${name}" ditambahkan ke daftar menu`);
   /* put it into the first empty row of the relevant table */
-  const box=$("#nm-cat").value==="alacarte"&&getRadio("menutype")==="Prasmanan"&&!$("#ac-wrap").hidden?"#ac-items":"#items";
-  const cls=box==="#items"?".item":".acrow";
+  const box="#items",cls=".item";
   const empty=[...document.querySelectorAll(box+" "+cls)].find(r=>!r.querySelector(".nm").value);
   if(empty){const sel=empty.querySelector(".nm");sel.value=name;sel.dispatchEvent(new Event("change",{bubbles:true}))}
 };
-async function addMenu(name,category,price){
+async function addMenu(name){const category="prasmanan",price=0;
   if(menus.some(m=>m.name.trim().toLowerCase()===name.toLowerCase()))return {error:"Menu dengan nama ini sudah ada di daftar."};
   const {data,error}=await sb.from("menu_items").insert({name,category,price}).select("id,name,category,price,active").single();
   if(error)return {error:/duplicate|unique/i.test(error.message)?"Menu dengan nama ini sudah ada di daftar.":"Gagal menambah menu: "+error.message};
@@ -1072,25 +1078,25 @@ async function addMenu(name,category,price){
 let mmEditing=null;
 function renderMenuList(){
   const q=$("#mm-q").value.trim().toLowerCase();
-  const list=menus.filter(m=>!q||m.name.toLowerCase().includes(q)).sort((a,b)=>(b.active-a.active)||a.category.localeCompare(b.category)||a.name.localeCompare(b.name));
-  $("#mm-count").textContent=menus.filter(m=>m.active).length+" aktif";
+  const all=menus.filter(m=>m.category==="prasmanan");
+  const list=all.filter(m=>!q||m.name.toLowerCase().includes(q)).sort((a,b)=>(b.active-a.active)||a.name.localeCompare(b.name));
+  $("#mm-count").textContent=all.filter(m=>m.active).length+" aktif";
   const edit=can.menus();
   $("#mm-list").innerHTML=list.length?list.map(m=>mmEditing===m.id?
-    `<div class="mrow edit" data-mid="${m.id}"><input class="inp" data-f="name" value="${esc(m.name)}" aria-label="Nama"><select class="inp cat" data-f="cat" aria-label="Kategori"><option value="prasmanan"${m.category==="prasmanan"?" selected":""}>Prasmanan</option><option value="alacarte"${m.category==="alacarte"?" selected":""}>À la carte</option></select><input class="inp" data-f="price" inputmode="numeric" value="${m.price?Number(m.price).toLocaleString("id-ID"):""}" placeholder="Rp" aria-label="Harga"><div class="acts"><button class="btn sm primary" type="button" data-msave>Simpan</button><button class="btn sm ghost" type="button" data-mcancel>Batal</button></div></div>`
-   :`<div class="mrow${m.active?"":" off"}" data-mid="${m.id}"><span class="nm">${esc(m.name)}${m.active?"":" · nonaktif"}</span><span class="cat cat-pill ${m.category}">${CAT_LABEL[m.category]}</span><span class="price">${m.price?rp(m.price):'<span class="hint">tanpa harga</span>'}</span><div class="acts">${edit?`<button class="btn sm ghost" type="button" data-medit>Edit</button><button class="btn sm ghost" type="button" data-mtoggle>${m.active?"Nonaktifkan":"Aktifkan"}</button>`:""}${can.delMenu()?`<button class="btn sm ghost danger" type="button" data-mdel>Hapus</button>`:""}</div></div>`).join("")
+    `<div class="mrow edit" data-mid="${m.id}"><input class="inp" data-f="name" value="${esc(m.name)}" aria-label="Nama"><div class="acts"><button class="btn sm primary" type="button" data-msave>Simpan</button><button class="btn sm ghost" type="button" data-mcancel>Batal</button></div></div>`
+   :`<div class="mrow${m.active?"":" off"}" data-mid="${m.id}"><span class="nm">${esc(m.name)}${m.active?"":" · nonaktif"}</span><div class="acts">${edit?`<button class="btn sm ghost" type="button" data-medit>Edit</button><button class="btn sm ghost" type="button" data-mtoggle>${m.active?"Nonaktifkan":"Aktifkan"}</button>`:""}${can.delMenu()?`<button class="btn sm ghost danger" type="button" data-mdel>Hapus</button>`:""}</div></div>`).join("")
    :`<p class="hint">${q?"Tidak ada menu yang cocok.":"Belum ada menu. Tambahkan menu pertama di atas."}</p>`;
 }
 $("#btn-menus").onclick=()=>{mmEditing=null;$("#mm-q").value="";$("#scrim").hidden=false;$("#menus").hidden=false;renderMenuList()};
 $("#mm-q").addEventListener("input",renderMenuList);
-$("#mm-price").addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""});
 $("#mm-form").addEventListener("submit",async e=>{
   e.preventDefault();showErr($("#mm-err"),"");
   const name=$("#mm-name").value.trim();if(!name)return;
   const btn=$("#mm-btn");btn.disabled=true;
-  const r=await addMenu(name,$("#mm-cat").value,num($("#mm-price").value));
+  const r=await addMenu(name);
   btn.disabled=false;
   if(r.error){showErr($("#mm-err"),r.error);return}
-  toast("Menu ditambahkan");$("#mm-name").value="";$("#mm-price").value="";$("#mm-name").focus();
+  toast("Menu ditambahkan");$("#mm-name").value="";$("#mm-name").focus();
 });
 $("#mm-list").addEventListener("click",async e=>{
   const row=e.target.closest("[data-mid]");if(!row)return;const id=row.dataset.mid,m=menus.find(x=>x.id===id);
@@ -1099,7 +1105,7 @@ $("#mm-list").addEventListener("click",async e=>{
   if(e.target.closest("[data-msave]")){
     const name=row.querySelector('[data-f="name"]').value.trim();if(!name){toast("Nama menu wajib diisi");return}
     if(menus.some(x=>x.id!==id&&x.name.trim().toLowerCase()===name.toLowerCase())){toast("Nama menu sudah dipakai");return}
-    const patch={name,category:row.querySelector('[data-f="cat"]').value,price:num(row.querySelector('[data-f="price"]').value)};
+    const patch={name};
     const {error}=await sb.from("menu_items").update(patch).eq("id",id);
     if(error){toast("Gagal menyimpan: "+error.message);return}
     Object.assign(m,patch);mmEditing=null;renderMenuList();refreshMenuSelects();toast("Menu disimpan");
