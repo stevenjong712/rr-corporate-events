@@ -157,6 +157,30 @@ label.f textarea{height:auto;min-height:84px;padding:9px 11px;resize:vertical;li
 .po .item,.po .itemhead{grid-template-columns:minmax(0,1fr) 64px 116px minmax(0,.7fr) 36px}
 .po .item .pr,.po .itemhead .pr{display:block}
 .item .pr{text-align:right}
+.acwrap{display:flex;flex-direction:column;gap:8px;border:1px dashed var(--line);border-radius:8px;padding:12px;background:var(--bg)}
+.acwrap .field-h{margin:0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.acrow,.achead{display:grid;grid-template-columns:minmax(0,1fr) 64px 116px 36px;gap:8px;align-items:center}
+.achead{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.achead span:nth-child(3),.acrow .pr{text-align:right}
+.acrow .inp,.item .inp{background:var(--surface)}
+.acrow .x{border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;height:40px;border-radius:7px}
+.acrow .x:hover{color:var(--warn);border-color:var(--line)}
+@media (max-width:560px){.acrow,.achead{grid-template-columns:minmax(0,1fr) 52px 96px 36px}}
+select.inp{appearance:auto;padding-right:6px;text-overflow:ellipsis}
+.menu-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.newmenu{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.9fr) auto;gap:8px;align-items:end;border:1px solid var(--accent);border-radius:8px;padding:12px;background:var(--accent-soft)}
+.newmenu .inp{background:var(--surface)}
+@media (max-width:560px){.newmenu{grid-template-columns:1fr 1fr}.newmenu .acts2{grid-column:1/-1}}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) 110px 120px auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:0}
+.mrow.off{opacity:.5}
+.mrow .nm{font-weight:600;overflow-wrap:anywhere}
+.mrow .price{text-align:right;font-variant-numeric:tabular-nums}
+.mrow .acts{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
+.mrow.edit{grid-template-columns:minmax(0,1fr) 120px 120px auto}
+@media (max-width:560px){.mrow,.mrow.edit{grid-template-columns:minmax(0,1fr) auto}.mrow .cat{display:none}.mrow.edit .cat{display:block}.mrow .acts{grid-column:1/-1;justify-content:flex-start}}
+.cat-pill{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunken);color:var(--muted);justify-self:start}
+.cat-pill.alacarte{background:var(--accent-soft);color:var(--accent)}
 .ots-note{font-size:13px;color:var(--muted);background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:12px 14px;margin:0}
 .item .x{border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;height:40px;border-radius:7px}
 .item .x:hover{color:var(--warn);border-color:var(--line)}
@@ -262,6 +286,7 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
     </div>
     <div class="userbar">
       <span class="me"><span id="me-name"></span><span class="role" id="me-role"></span></span>
+      <button class="btn" id="btn-menus" type="button" hidden>Daftar menu</button>
       <button class="btn" id="btn-users" type="button" hidden>Kelola akses</button>
       <button class="btn primary" id="btn-new" type="button" hidden>+ Booking baru</button>
       <button class="btn ghost" type="button" data-logout>Keluar</button>
@@ -369,7 +394,23 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
       <div id="menu-wrap" style="display:flex;flex-direction:column;gap:8px">
         <div class="itemhead"><span>Nama menu</span><span>Jumlah</span><span class="pr" style="text-align:right">Harga / item</span><span class="note">Catatan</span><span></span></div>
         <div class="items" id="items"></div>
-        <p class="hint" id="items-hint">Baris baru otomatis muncul setelah baris terakhir diisi.</p>
+        <p class="hint" id="items-hint">Pilih menu dari daftar. Baris baru otomatis muncul setelah baris terakhir diisi.</p>
+        <div class="acwrap" id="ac-wrap" hidden>
+          <div class="field-h"><b>Tambahan menu à la carte</b><button class="btn sm ghost" type="button" id="ac-remove">Hapus semua à la carte</button></div>
+          <div class="achead"><span>Nama menu</span><span>Qty</span><span>Harga / item</span><span></span></div>
+          <div class="items" id="ac-items"></div>
+        </div>
+        <div class="menu-tools">
+          <button class="btn sm" type="button" id="ac-add">+ Tambah menu à la carte</button>
+          <button class="btn sm ghost" type="button" id="nm-open">+ Menu baru ke daftar</button>
+        </div>
+        <div class="newmenu" id="nm-box" hidden>
+          <label class="f"><span class="lbl">Nama menu baru</span><input class="inp" id="nm-name" placeholder="Contoh: Ayam bakar madu"></label>
+          <label class="f"><span class="lbl">Kategori</span><select class="inp" id="nm-cat"><option value="prasmanan">Prasmanan</option><option value="alacarte">À la carte</option></select></label>
+          <label class="f"><span class="lbl">Harga (Rp)</span><input class="inp" id="nm-price" inputmode="numeric" placeholder="0"></label>
+          <div class="acts2" style="display:flex;gap:6px"><button class="btn sm primary" type="button" id="nm-save">Simpan</button><button class="btn sm ghost" type="button" id="nm-cancel">Batal</button></div>
+          <p class="err" id="nm-err" hidden style="grid-column:1/-1"></p>
+        </div>
       </div>
       <p class="ots-note" id="ots-note" hidden>Menu dipesan langsung di tempat (on the spot). Isi estimasi spend per pax untuk perkiraan total.</p>
       <div class="grid2">
@@ -469,6 +510,33 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
   <footer><span></span><div style="display:flex;gap:8px"><button class="btn" type="button" id="cancel-no">Kembali</button><button class="btn primary" type="button" id="cancel-yes">Batalkan booking</button></div></footer>
 </div>
 
+<aside class="sheet" id="menus" hidden aria-labelledby="menus-title">
+  <header>
+    <h2 id="menus-title">Daftar menu</h2>
+    <button class="btn ghost" type="button" data-close>Tutup</button>
+  </header>
+  <div class="body">
+    <section class="sec" id="mm-add-sec">
+      <div class="sec-h"><h3>Tambah menu</h3></div>
+      <form id="mm-form" onsubmit="return false" autocomplete="off" style="display:flex;flex-direction:column;gap:12px">
+        <div class="grid3">
+          <label class="f"><span class="lbl">Nama menu<span class="req">*</span></span><input id="mm-name" required></label>
+          <label class="f"><span class="lbl">Kategori</span><select id="mm-cat" class="inp"><option value="prasmanan">Prasmanan</option><option value="alacarte">À la carte</option></select></label>
+          <label class="f"><span class="lbl">Harga (Rp)</span><input id="mm-price" inputmode="numeric" placeholder="0"></label>
+        </div>
+        <p class="hint">Harga dipakai otomatis untuk Pre-Order dan tambahan à la carte. Menu prasmanan boleh tanpa harga.</p>
+        <p class="err" id="mm-err" hidden></p>
+        <div><button class="btn primary" type="submit" id="mm-btn">Tambah menu</button></div>
+      </form>
+    </section>
+    <section class="sec">
+      <div class="sec-h"><h3>Semua menu</h3><span id="mm-count"></span></div>
+      <input class="search" id="mm-q" style="flex:none" type="search" placeholder="Cari menu…" aria-label="Cari menu">
+      <div id="mm-list"></div>
+    </section>
+  </div>
+</aside>
+
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -488,7 +556,7 @@ const MONTHS=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov",
 const MONTHS_L=["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 const DAYS=["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
 
-let me=null, bookings=[], channel=null;
+let me=null, bookings=[], menus=[], channel=null;
 let filter={q:"",status:"all",period:"upcoming"};
 let editing=null, pendingProof=null, beoBooking=null;
 
@@ -497,8 +565,11 @@ const can={
   editAll:()=>["master_admin","admin","sales"].includes(me?.role),
   editDp:()=>["master_admin","admin","sales","finance"].includes(me?.role),
   remove:()=>["master_admin","admin"].includes(me?.role),
-  users:()=>me?.role==="master_admin"
+  users:()=>me?.role==="master_admin",
+  menus:()=>["master_admin","admin","sales"].includes(me?.role),
+  delMenu:()=>["master_admin","admin"].includes(me?.role)
 };
+const CAT_LABEL={prasmanan:"Prasmanan",alacarte:"À la carte"};
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const num=v=>{const n=parseInt(String(v??"").replace(/[^\d]/g,""),10);return isNaN(n)?0:n};
@@ -510,16 +581,24 @@ function shortDate(s){const d=parseD(s);return d?`${d.getDate()} ${MONTHS[d.getM
 function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600)}
 function showErr(el,msg){el.textContent=msg;el.hidden=!msg}
 const PO="Pre-Order",OTS="On the Spot";
-function subtotalOf(type,price,pax,items){if(type===PO)return (items||[]).reduce((a,i)=>a+num(i.qty)*num(i.price),0);return (+price||0)*(+pax||0)}
+const lineSum=arr=>(arr||[]).reduce((a,i)=>a+num(i.qty)*num(i.price),0);
+function subtotalOf(type,price,pax,items,ac){if(type===PO)return lineSum(items);const base=(+price||0)*(+pax||0);return type===OTS?base:base+lineSum(ac)}
 function calcTotals(sub,svc,tax){sub=+sub||0;const s=svc?Math.round(sub*0.07):0;const t=tax?Math.round((sub+s)*0.10):0;return{sub,svc:s,tax:t,total:sub+s+t}}
-function bCalc(b){return calcTotals(subtotalOf(b.menuType,b.pricePerPax,b.pax,b.items),b.withService,b.withTax)}
+function bCalc(b){return calcTotals(subtotalOf(b.menuType,b.pricePerPax,b.pax,b.items,b.alacarte),b.withService,b.withTax)}
 function readItems(){return [...document.querySelectorAll("#items .item")].map(r=>({name:r.querySelector(".nm").value.trim(),qty:r.querySelector(".qt").value.trim(),price:num(r.querySelector(".pr").value),note:r.querySelector(".note").value.trim()})).filter(i=>i.name)}
-function formSubtotal(){return subtotalOf(getRadio("menutype"),num($("#f-price").value),num($("#f-pax").value),readItems())}
+function readAcAll(){return [...document.querySelectorAll("#ac-items .acrow")].map(r=>r.querySelector(".nm").value.trim()).filter(Boolean)}
+function readAc(){if($("#ac-wrap").hidden)return [];return [...document.querySelectorAll("#ac-items .acrow")].map(r=>({name:r.querySelector(".nm").value.trim(),qty:r.querySelector(".qt").value.trim(),price:num(r.querySelector(".pr").value)})).filter(i=>i.name)}
+function formSubtotal(){return subtotalOf(getRadio("menutype"),num($("#f-price").value),num($("#f-pax").value),readItems(),readAc())}
 function renderCalc(){
   const type=getRadio("menutype"),pax=num($("#f-pax").value);
   const c=calcTotals(formSubtotal(),$("#f-svc").checked,$("#f-tax").checked);
-  const lbl=type===PO?"Subtotal (jumlah × harga menu)":type===OTS?`Estimasi (spend per pax × ${pax} pax)`:`Subtotal (harga × ${pax} pax)`;
-  $("#calc").innerHTML=`<div><span>${lbl}</span><b>${rp(c.sub)}</b></div>`+
+  const price=num($("#f-price").value),ac=type==="Prasmanan"?readAc():[],acSum=lineSum(ac);
+  let head;
+  if(type===PO)head=`<div><span>Subtotal (jumlah × harga menu)</span><b>${rp(c.sub)}</b></div>`;
+  else if(type===OTS)head=`<div><span>Estimasi (spend per pax × ${pax} pax)</span><b>${rp(c.sub)}</b></div>`;
+  else head=`<div><span>Prasmanan (harga × ${pax} pax)</span><b>${rp(price*pax)}</b></div>`+
+    (ac.length?`<div><span>À la carte (${ac.length} menu)</span><b>${rp(acSum)}</b></div><div><span>Subtotal</span><b>${rp(c.sub)}</b></div>`:"");
+  $("#calc").innerHTML=head+
     ($("#f-svc").checked?`<div><span>Service charge 7%</span><b>${rp(c.svc)}</b></div>`:"")+
     ($("#f-tax").checked?`<div><span>Pajak 10%${$("#f-svc").checked?" (dari subtotal + service)":""}</span><b>${rp(c.tax)}</b></div>`:"")+
     `<div class="tot"><span>Estimasi total</span><b>${rp(c.total)}</b></div>`;
@@ -538,11 +617,11 @@ function dpState(b){
 function fromRow(r){return{id:r.id,company:r.company||"",customer:r.customer||"",pic:r.pic||"",phone:r.phone||"",email:r.email||"",
   eventDate:r.event_date||"",startTime:r.start_time||"",endTime:r.end_time||"",pax:r.pax||0,area:r.area||"",eventName:r.event_name||"",setup:r.setup||"",
   status:r.status,dpNeeded:r.dp_needed,dpAmount:r.dp_amount||0,dpDate:r.dp_date||"",dpReceived:r.dp_received,dpLink:r.dp_link||"",dpProofPath:r.dp_proof_path||"",
-  menuType:r.menu_type||"",items:r.items||[],pricePerPax:r.price_per_pax||0,total:r.total||0,withService:!!r.with_service,withTax:!!r.with_tax,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at,cancelledAt:r.cancelled_at||"",cancelReason:r.cancel_reason||""}}
+  menuType:r.menu_type||"",items:r.items||[],alacarte:r.alacarte||[],pricePerPax:r.price_per_pax||0,total:r.total||0,withService:!!r.with_service,withTax:!!r.with_tax,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at,cancelledAt:r.cancelled_at||"",cancelReason:r.cancel_reason||""}}
 function toRow(b){return{company:b.company||null,customer:b.customer,pic:b.pic||null,phone:b.phone||null,email:b.email||null,
   event_date:b.eventDate||null,start_time:b.startTime||null,end_time:b.endTime||null,pax:b.pax||0,area:b.area||null,event_name:b.eventName||null,setup:b.setup||null,
   status:b.status,dp_needed:!!b.dpNeeded,dp_amount:b.dpAmount||0,dp_date:b.dpDate||null,dp_received:!!b.dpReceived,dp_link:b.dpLink||null,dp_proof_path:b.dpProofPath||null,
-  menu_type:b.menuType||null,items:b.items||[],price_per_pax:b.pricePerPax||0,total:b.total||0,with_service:!!b.withService,with_tax:!!b.withTax,special:b.special||null,notes:b.notes||null}}
+  menu_type:b.menuType||null,items:b.items||[],alacarte:b.alacarte||[],price_per_pax:b.pricePerPax||0,total:b.total||0,with_service:!!b.withService,with_tax:!!b.withTax,special:b.special||null,notes:b.notes||null}}
 
 /* ---------- auth flow ---------- */
 function show(view){["#v-login","#v-pending","#v-app"].forEach(v=>$(v).hidden=v!==view)}
@@ -555,8 +634,8 @@ async function boot(){
   me=prof;
   $("#me-name").textContent=prof.full_name||prof.email;
   $("#me-role").textContent=ROLE_LABEL[prof.role];$("#me-role").className="role "+prof.role;
-  $("#btn-new").hidden=!can.create();$("#btn-users").hidden=!can.users();
-  show("#v-app");renderChips();await loadBookings();subscribe();
+  $("#btn-new").hidden=!can.create();$("#btn-users").hidden=!can.users();$("#btn-menus").hidden=!can.menus();
+  show("#v-app");renderChips();await Promise.all([loadMenus(),loadBookings()]);subscribe();
 }
 async function showLogin(){
   show("#v-login");$("#login-form").hidden=false;$("#setup-form").hidden=true;
@@ -597,9 +676,18 @@ async function loadBookings(){
   bookings=data.map(fromRow);render();
   if(beoBooking){const f=bookings.find(x=>x.id===beoBooking.id);if(f){beoBooking=f;renderBeo()}}
 }
+async function loadMenus(){
+  const {data,error}=await sb.from("menu_items").select("id,name,category,price,active").order("name");
+  if(error)return;menus=data||[];
+  if(!$("#menus").hidden)renderMenuList();
+  refreshMenuSelects();
+}
 function subscribe(){
   if(channel)return;
-  let t;channel=sb.channel("bookings-live").on("postgres_changes",{event:"*",schema:"public",table:"bookings"},()=>{clearTimeout(t);t=setTimeout(loadBookings,300)}).subscribe();
+  let t,m;channel=sb.channel("bookings-live")
+    .on("postgres_changes",{event:"*",schema:"public",table:"bookings"},()=>{clearTimeout(t);t=setTimeout(loadBookings,300)})
+    .on("postgres_changes",{event:"*",schema:"public",table:"menu_items"},()=>{clearTimeout(m);m=setTimeout(loadMenus,300)})
+    .subscribe();
 }
 
 /* ---------- list ---------- */
@@ -660,7 +748,7 @@ function render(){
       <div class="date">${d?`<b>${d.getDate()}</b><span>${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}</span>`:`<span>Tgl ?</span>`}</div>
       <div class="who"><h3>${esc(b.company||b.customer)||"(Tanpa nama)"}</h3><p>${b.company?esc(b.customer||"-"):"Perorangan / tanpa perusahaan"}${b.pic&&b.pic!==b.customer?" · PIC "+esc(b.pic):""} · ${esc(b.phone||"-")}${b.startTime?" · "+esc(b.startTime)+(b.endTime?"–"+esc(b.endTime):""):""}</p></div>
       <div class="pax"><b>${+b.pax||0}</b><span>pax</span>${amtHtml(b)}</div>
-      <div class="menu"><b>${esc(b.menuType||"-")}</b><span title="${esc(items.join(", "))}">${b.menuType===OTS?"Dipesan di tempat":items.length?esc(items.join(", ")):"Menu belum dipilih"}</span></div>
+      <div class="menu"><b>${esc(b.menuType||"-")}</b><span title="${esc(items.join(", "))}">${b.menuType===OTS?"Dipesan di tempat":items.length?esc(items.join(", ")):"Menu belum dipilih"}</span>${b.menuType==="Prasmanan"&&(b.alacarte||[]).length?`<span>+ ${(b.alacarte||[]).length} à la carte</span>`:""}</div>
       <div class="st">
         <select class="pill ${b.status}" data-status="${b.id}" aria-label="Ubah status"${editable?"":" disabled"}>${Object.entries(STATUS).map(([k,v])=>`<option value="${k}"${k===b.status?" selected":""}>${v.label}</option>`).join("")}</select>
         ${dp?`<span class="dp ${dp.cls}">${esc(dp.txt)}</span>`:""}
@@ -672,22 +760,58 @@ function render(){
 /* ---------- booking form ---------- */
 function setRadio(name,val){const el=document.querySelector(`input[name="${name}"][value="${val}"]`);if(el)el.checked=true}
 function getRadio(name){return document.querySelector(`input[name="${name}"]:checked`)?.value}
+function menuOptions(selected,prefer){
+  const order=prefer==="alacarte"?["alacarte","prasmanan"]:["prasmanan","alacarte"];
+  const sel=(selected||"").trim(),selL=sel.toLowerCase();
+  let found=false,html=`<option value="">Pilih menu…</option>`;
+  order.forEach(cat=>{
+    const list=menus.filter(m=>m.category===cat&&(m.active||m.name.toLowerCase()===selL));
+    if(!list.length)return;
+    html+=`<optgroup label="${CAT_LABEL[cat]}">`+list.map(m=>{const on=m.name.toLowerCase()===selL;if(on)found=true;
+      return `<option value="${esc(m.name)}" data-price="${m.price||0}"${on?" selected":""}>${esc(m.name)}${m.price?" — "+rp(m.price):""}</option>`}).join("")+`</optgroup>`;
+  });
+  if(sel&&!found)html+=`<optgroup label="Tidak ada di daftar"><option value="${esc(sel)}" selected>${esc(sel)}</option></optgroup>`;
+  if(!menus.length)html+=`<option value="" disabled>Daftar menu masih kosong</option>`;
+  return html;
+}
 function itemRow(it={}){
   const div=document.createElement("div");div.className="item";
-  div.innerHTML=`<input class="inp nm" placeholder="Nama menu" value="${esc(it.name)}" aria-label="Nama menu"><input class="inp qt" placeholder="Qty" inputmode="numeric" value="${esc(it.qty)}" aria-label="Jumlah"><input class="inp pr" placeholder="Rp" inputmode="numeric" value="${it.price?Number(it.price).toLocaleString("id-ID"):""}" aria-label="Harga per item"><input class="inp note" placeholder="Catatan" value="${esc(it.note)}" aria-label="Catatan menu"><button type="button" class="x" aria-label="Hapus menu">×</button>`;
+  div.innerHTML=`<select class="inp nm" aria-label="Nama menu">${menuOptions(it.name,getRadio("menutype")===PO?"alacarte":"prasmanan")}</select><input class="inp qt" placeholder="Qty" inputmode="numeric" value="${esc(it.qty)}" aria-label="Jumlah"><input class="inp pr" placeholder="Rp" inputmode="numeric" value="${it.price?Number(it.price).toLocaleString("id-ID"):""}" aria-label="Harga per item"><input class="inp note" placeholder="Catatan" value="${esc(it.note)}" aria-label="Catatan menu"><button type="button" class="x" aria-label="Hapus menu">×</button>`;
   div.querySelector(".x").onclick=()=>{div.remove();ensureTrailingRow();renderCalc()};
   div.querySelector(".x").hidden=!can.editAll();
   return div;
 }
-function ensureTrailingRow(){
+function acRow(it={}){
+  const div=document.createElement("div");div.className="acrow";
+  div.innerHTML=`<select class="inp nm" aria-label="Menu à la carte">${menuOptions(it.name,"alacarte")}</select><input class="inp qt" placeholder="Qty" inputmode="numeric" value="${esc(it.qty)}" aria-label="Qty"><input class="inp pr" placeholder="Rp" inputmode="numeric" value="${it.price?Number(it.price).toLocaleString("id-ID"):""}" aria-label="Harga per item"><button type="button" class="x" aria-label="Hapus">×</button>`;
+  div.querySelector(".x").onclick=()=>{div.remove();ensureTrailingRow("#ac-items");renderCalc()};
+  div.querySelector(".x").hidden=!can.editAll();
+  return div;
+}
+function ensureTrailingRow(box="#items"){
   if(!can.editAll())return;
-  const rows=[...document.querySelectorAll("#items .item")],last=rows[rows.length-1];
-  if(!last||last.querySelector(".nm").value.trim())$("#items").appendChild(itemRow());
+  const cls=box==="#items"?".item":".acrow";
+  const rows=[...document.querySelectorAll(box+" "+cls)],last=rows[rows.length-1];
+  if(!last||last.querySelector(".nm").value.trim())$(box).appendChild(box==="#items"?itemRow():acRow());
+}
+function refreshMenuSelects(){
+  document.querySelectorAll("#items .item .nm").forEach(sel=>{const v=sel.value;sel.innerHTML=menuOptions(v,getRadio("menutype")===PO?"alacarte":"prasmanan")});
+  document.querySelectorAll("#ac-items .acrow .nm").forEach(sel=>{const v=sel.value;sel.innerHTML=menuOptions(v,"alacarte")});
+}
+function setAc(list){
+  const box=$("#ac-items");box.innerHTML="";(list||[]).forEach(i=>box.appendChild(acRow(i)));
+  $("#ac-wrap").hidden=!(list&&list.length);if(!$("#ac-wrap").hidden)ensureTrailingRow("#ac-items");
 }
 function syncMenuType(){
   const t=getRadio("menutype");
   $("#menu-wrap").hidden=t===OTS;$("#ots-note").hidden=t!==OTS;
   $("#menu-wrap").classList.toggle("po",t===PO);
+  const isPras=t==="Prasmanan";
+  if(!isPras)$("#ac-wrap").hidden=true;
+  else if(readAcAll().length)$("#ac-wrap").hidden=false;
+  $("#ac-add").hidden=!isPras||!$("#ac-wrap").hidden||!can.editAll();
+  $("#nm-open").hidden=!can.menus();
+  refreshMenuSelects();
   $("#price-wrap").hidden=t===PO;
   $("#price-lbl").textContent=t===OTS?"Estimasi spend per pax (Rp)":"Harga per pax (Rp)";
   renderCalc();
@@ -708,12 +832,13 @@ async function renderProof(){
 function lockForm(){
   const all=can.editAll(),dp=can.editDp();
   const dpIds=["f-dpamount","f-dpdate","f-dpreceived","f-dplink"];
-  document.querySelectorAll("#form input, #form textarea").forEach(el=>{
+  document.querySelectorAll("#form input, #form textarea, #form select").forEach(el=>{
     const isDp=dpIds.includes(el.id)||el.name==="dpneed";
     el.disabled=!(all||(dp&&isDp));
   });
   document.querySelectorAll("#form .seg").forEach(s=>{const isDp=!!s.querySelector('input[name="dpneed"]');s.classList.toggle("locked",!(all||(dp&&isDp)))});
-  $("#items-hint").hidden=!all;document.querySelectorAll("#items .x").forEach(x=>x.hidden=!all);
+  $("#items-hint").hidden=!all;document.querySelectorAll("#items .x, #ac-items .x").forEach(x=>x.hidden=!all);
+  $("#ac-remove").hidden=!all;if(!all){$("#ac-add").hidden=true;$("#nm-open").hidden=true;$("#nm-box").hidden=true}
   $("#upload-btn").hidden=!dp;$("#upload-hint").hidden=!dp;
   $("#save-btn").hidden=!dp;
   if(me.role==="finance")$("#sheet-title").textContent="Update DP";
@@ -730,7 +855,9 @@ function openForm(b){
   set("#f-special",f.special);set("#f-notes",f.notes);
   setRadio("status",f.status||"early");setRadio("dpneed",f.dpNeeded===false?"no":"yes");setRadio("menutype",f.menuType||"Prasmanan");
   pendingProof=f.dpProofPath||null;renderProof();
+  setRadio("menutype",f.menuType||"Prasmanan");
   const items=$("#items");items.innerHTML="";(f.items||[]).forEach(i=>items.appendChild(itemRow(i)));ensureTrailingRow();
+  setAc(f.menuType==="Prasmanan"?f.alacarte:[]);$("#nm-box").hidden=true;
   $("#upload-hint").textContent="Foto atau PDF, maks 20 MB.";
   $("#del-zone").innerHTML=b&&can.editAll()?`<button class="btn sm ghost danger" type="button" id="del">Batalkan / hapus booking</button>`:"";
   if($("#del"))$("#del").onclick=()=>openCancel(editing);
@@ -750,7 +877,7 @@ $("#cancel-yes").onclick=async()=>{
   if(error){toast("Gagal membatalkan: "+error.message);return}
   $("#cancel").hidden=true;cancelTarget=null;closeAll();toast("Booking dipindah ke daftar Dibatalkan / dihapus");loadBookings();
 };
-function closeAll(){["#scrim","#sheet","#beo","#users","#cancel"].forEach(s=>$(s).hidden=true);editing=null;beoBooking=null}
+function closeAll(){["#scrim","#sheet","#beo","#users","#cancel","#menus"].forEach(s=>$(s).hidden=true);editing=null;beoBooking=null}
 
 $("#f-dpfile").addEventListener("change",async e=>{
   const file=e.target.files[0];if(!file)return;
@@ -770,13 +897,14 @@ $("#form").addEventListener("submit",async e=>{
   e.preventDefault();
   const mt=getRadio("menutype");
   const items=mt===OTS?[]:readItems().map(i=>mt===PO?i:{name:i.name,qty:i.qty,note:i.note});
+  const alacarte=mt==="Prasmanan"?readAc():[];
   const pax=num($("#f-pax").value),price=mt===PO?0:num($("#f-price").value);
   const status=getRadio("status"),dpNeeded=getRadio("dpneed")==="yes";
   const b={
     company:$("#f-company").value.trim(),customer:$("#f-customer").value.trim(),pic:$("#f-pic").value.trim(),phone:$("#f-phone").value.trim(),email:$("#f-email").value.trim(),
     eventDate:$("#f-date").value,startTime:$("#f-start").value,endTime:$("#f-end").value,pax,area:$("#f-area").value.trim(),eventName:$("#f-eventname").value.trim(),setup:$("#f-setup").value.trim(),
     status,dpNeeded:status==="confirmed"?dpNeeded:true,dpAmount:num($("#f-dpamount").value),dpDate:$("#f-dpdate").value,dpReceived:$("#f-dpreceived").checked,dpLink:$("#f-dplink").value.trim(),
-    dpProofPath:pendingProof||"",menuType:getRadio("menutype"),items,pricePerPax:price,withService:$("#f-svc").checked,withTax:$("#f-tax").checked,total:calcTotals(subtotalOf(mt,price,pax,items),$("#f-svc").checked,$("#f-tax").checked).total,
+    dpProofPath:pendingProof||"",menuType:getRadio("menutype"),items,alacarte,pricePerPax:price,withService:$("#f-svc").checked,withTax:$("#f-tax").checked,total:calcTotals(subtotalOf(mt,price,pax,items,alacarte),$("#f-svc").checked,$("#f-tax").checked).total,
     special:$("#f-special").value.trim(),notes:$("#f-notes").value.trim()
   };
   if(!b.customer&&editing)b.customer=editing.customer;
@@ -809,10 +937,14 @@ function buildBeo(b,wa){
   if(b.menuType===OTS)L.push("Menu dipesan langsung di tempat (on the spot)");
   else if(items.length)items.forEach((i,n)=>L.push(`${n+1}. ${i.name}${i.qty?" — "+i.qty+(/^\d+$/.test(i.qty)?" porsi":""):""}${b.menuType===PO&&i.price?` × ${rp(i.price)} = ${rp(num(i.qty)*i.price)}`:""}${i.note?" ("+i.note+")":""}`));
   else L.push("Menu belum ditentukan");
+  const ac=b.menuType==="Prasmanan"?(b.alacarte||[]).filter(i=>i.name):[];
+  if(ac.length){L.push("");L.push(H("TAMBAHAN À LA CARTE"));ac.forEach((i,n)=>L.push(`${n+1}. ${i.name} — ${i.qty||0}${i.price?` × ${rp(i.price)} = ${rp(num(i.qty)*i.price)}`:""}`))}
   L.push("");L.push(H("SPECIAL REQUEST"));L.push(b.special||"-");L.push("");
   L.push(H("PEMBAYARAN"));{const c=bCalc(b);
   if(b.menuType===PO)L.push(`Subtotal  : ${rp(c.sub)} (total pre-order)`);
-  else{L.push(`${b.menuType===OTS?"Est./pax  ":"Harga/pax "}: ${rp(b.pricePerPax)}`);L.push(`${b.menuType===OTS?"Estimasi  ":"Subtotal  "}: ${rp(c.sub)} (${b.pax||0} pax)`)}
+  else if(b.menuType===OTS){L.push(`Est./pax  : ${rp(b.pricePerPax)}`);L.push(`Estimasi  : ${rp(c.sub)} (${b.pax||0} pax)`)}
+  else{L.push(`Harga/pax : ${rp(b.pricePerPax)}`);L.push(`Prasmanan : ${rp((b.pricePerPax||0)*(b.pax||0))} (${b.pax||0} pax)`);
+    if(ac.length){L.push(`À la carte: ${rp(lineSum(ac))}`);L.push(`Subtotal  : ${rp(c.sub)}`)}}
   if(b.withService)L.push(`Service 7%: ${rp(c.svc)}`);if(b.withTax)L.push(`Pajak 10% : ${rp(c.tax)}`);
   L.push(`Total     : ${rp(c.total)}${!b.withService&&!b.withTax?" (belum termasuk service & pajak)":""}`);}
   if(b.status==="confirmed"){
@@ -897,8 +1029,95 @@ $("#u-list").addEventListener("click",async e=>{
 /* ---------- events ---------- */
 $("#btn-new").onclick=()=>openForm(null);
 ["#f-price","#f-pax"].forEach(id=>$(id).addEventListener("input",renderCalc));["#f-svc","#f-tax"].forEach(id=>$(id).addEventListener("change",renderCalc));
-$("#items").addEventListener("input",e=>{if(e.target.classList.contains("nm"))ensureTrailingRow();if(e.target.matches(".qt,.pr"))renderCalc()});
-$("#items").addEventListener("focusout",e=>{if(e.target.classList.contains("pr")){const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}if(e.target.classList.contains("nm"))renderCalc()});
+function onMenuPick(e,box){
+  const sel=e.target;if(!sel.classList.contains("nm"))return;
+  const row=sel.closest(".item,.acrow"),pr=row.querySelector(".pr"),opt=sel.selectedOptions[0];
+  const p=num(opt&&opt.dataset.price);
+  if(pr&&p&&(box==="#ac-items"||getRadio("menutype")===PO))pr.value=p.toLocaleString("id-ID");
+  const qt=row.querySelector(".qt");
+  if(qt&&!qt.value.trim()&&sel.value){qt.value=box==="#items"&&getRadio("menutype")==="Prasmanan"&&num($("#f-pax").value)?num($("#f-pax").value):"1"}
+  ensureTrailingRow(box);renderCalc();
+}
+["#items","#ac-items"].forEach(box=>{
+  $(box).addEventListener("change",e=>onMenuPick(e,box));
+  $(box).addEventListener("input",e=>{if(e.target.matches(".qt,.pr"))renderCalc()});
+  $(box).addEventListener("focusout",e=>{if(e.target.classList.contains("pr")){const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}});
+});
+$("#ac-add").onclick=()=>{$("#ac-wrap").hidden=false;$("#ac-add").hidden=true;if(!document.querySelector("#ac-items .acrow"))$("#ac-items").appendChild(acRow());ensureTrailingRow("#ac-items");$("#ac-items .acrow .nm").focus();renderCalc()};
+$("#ac-remove").onclick=()=>{$("#ac-items").innerHTML="";$("#ac-wrap").hidden=true;$("#ac-add").hidden=!can.editAll();renderCalc()};
+/* quick add menu from booking form */
+$("#nm-open").onclick=()=>{$("#nm-box").hidden=false;$("#nm-cat").value=getRadio("menutype")===PO?"alacarte":"prasmanan";$("#nm-name").value="";$("#nm-price").value="";showErr($("#nm-err"),"");$("#nm-name").focus()};
+$("#nm-cancel").onclick=()=>{$("#nm-box").hidden=true};
+$("#nm-box").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#nm-save").click()}});
+$("#nm-price").addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""});
+$("#nm-save").onclick=async()=>{
+  const name=$("#nm-name").value.trim();if(!name){showErr($("#nm-err"),"Isi nama menu.");return}
+  const r=await addMenu(name,$("#nm-cat").value,num($("#nm-price").value));
+  if(r.error){showErr($("#nm-err"),r.error);return}
+  $("#nm-box").hidden=true;toast(`"${name}" ditambahkan ke daftar menu`);
+  /* put it into the first empty row of the relevant table */
+  const box=$("#nm-cat").value==="alacarte"&&getRadio("menutype")==="Prasmanan"&&!$("#ac-wrap").hidden?"#ac-items":"#items";
+  const cls=box==="#items"?".item":".acrow";
+  const empty=[...document.querySelectorAll(box+" "+cls)].find(r=>!r.querySelector(".nm").value);
+  if(empty){const sel=empty.querySelector(".nm");sel.value=name;sel.dispatchEvent(new Event("change",{bubbles:true}))}
+};
+async function addMenu(name,category,price){
+  if(menus.some(m=>m.name.trim().toLowerCase()===name.toLowerCase()))return {error:"Menu dengan nama ini sudah ada di daftar."};
+  const {data,error}=await sb.from("menu_items").insert({name,category,price}).select("id,name,category,price,active").single();
+  if(error)return {error:/duplicate|unique/i.test(error.message)?"Menu dengan nama ini sudah ada di daftar.":"Gagal menambah menu: "+error.message};
+  menus.push(data);menus.sort((a,b)=>a.name.localeCompare(b.name));refreshMenuSelects();if(!$("#menus").hidden)renderMenuList();
+  return {data};
+}
+/* ---------- menu catalog sheet ---------- */
+let mmEditing=null;
+function renderMenuList(){
+  const q=$("#mm-q").value.trim().toLowerCase();
+  const list=menus.filter(m=>!q||m.name.toLowerCase().includes(q)).sort((a,b)=>(b.active-a.active)||a.category.localeCompare(b.category)||a.name.localeCompare(b.name));
+  $("#mm-count").textContent=menus.filter(m=>m.active).length+" aktif";
+  const edit=can.menus();
+  $("#mm-list").innerHTML=list.length?list.map(m=>mmEditing===m.id?
+    `<div class="mrow edit" data-mid="${m.id}"><input class="inp" data-f="name" value="${esc(m.name)}" aria-label="Nama"><select class="inp cat" data-f="cat" aria-label="Kategori"><option value="prasmanan"${m.category==="prasmanan"?" selected":""}>Prasmanan</option><option value="alacarte"${m.category==="alacarte"?" selected":""}>À la carte</option></select><input class="inp" data-f="price" inputmode="numeric" value="${m.price?Number(m.price).toLocaleString("id-ID"):""}" placeholder="Rp" aria-label="Harga"><div class="acts"><button class="btn sm primary" type="button" data-msave>Simpan</button><button class="btn sm ghost" type="button" data-mcancel>Batal</button></div></div>`
+   :`<div class="mrow${m.active?"":" off"}" data-mid="${m.id}"><span class="nm">${esc(m.name)}${m.active?"":" · nonaktif"}</span><span class="cat cat-pill ${m.category}">${CAT_LABEL[m.category]}</span><span class="price">${m.price?rp(m.price):'<span class="hint">tanpa harga</span>'}</span><div class="acts">${edit?`<button class="btn sm ghost" type="button" data-medit>Edit</button><button class="btn sm ghost" type="button" data-mtoggle>${m.active?"Nonaktifkan":"Aktifkan"}</button>`:""}${can.delMenu()?`<button class="btn sm ghost danger" type="button" data-mdel>Hapus</button>`:""}</div></div>`).join("")
+   :`<p class="hint">${q?"Tidak ada menu yang cocok.":"Belum ada menu. Tambahkan menu pertama di atas."}</p>`;
+}
+$("#btn-menus").onclick=()=>{mmEditing=null;$("#mm-q").value="";$("#scrim").hidden=false;$("#menus").hidden=false;renderMenuList()};
+$("#mm-q").addEventListener("input",renderMenuList);
+$("#mm-price").addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""});
+$("#mm-form").addEventListener("submit",async e=>{
+  e.preventDefault();showErr($("#mm-err"),"");
+  const name=$("#mm-name").value.trim();if(!name)return;
+  const btn=$("#mm-btn");btn.disabled=true;
+  const r=await addMenu(name,$("#mm-cat").value,num($("#mm-price").value));
+  btn.disabled=false;
+  if(r.error){showErr($("#mm-err"),r.error);return}
+  toast("Menu ditambahkan");$("#mm-name").value="";$("#mm-price").value="";$("#mm-name").focus();
+});
+$("#mm-list").addEventListener("click",async e=>{
+  const row=e.target.closest("[data-mid]");if(!row)return;const id=row.dataset.mid,m=menus.find(x=>x.id===id);
+  if(e.target.closest("[data-medit]")){mmEditing=id;renderMenuList();row.parentNode.querySelector(`[data-mid="${id}"] [data-f="name"]`)?.focus()}
+  if(e.target.closest("[data-mcancel]")){mmEditing=null;renderMenuList()}
+  if(e.target.closest("[data-msave]")){
+    const name=row.querySelector('[data-f="name"]').value.trim();if(!name){toast("Nama menu wajib diisi");return}
+    if(menus.some(x=>x.id!==id&&x.name.trim().toLowerCase()===name.toLowerCase())){toast("Nama menu sudah dipakai");return}
+    const patch={name,category:row.querySelector('[data-f="cat"]').value,price:num(row.querySelector('[data-f="price"]').value)};
+    const {error}=await sb.from("menu_items").update(patch).eq("id",id);
+    if(error){toast("Gagal menyimpan: "+error.message);return}
+    Object.assign(m,patch);mmEditing=null;renderMenuList();refreshMenuSelects();toast("Menu disimpan");
+  }
+  if(e.target.closest("[data-mtoggle]")){
+    const {error}=await sb.from("menu_items").update({active:!m.active}).eq("id",id);
+    if(error){toast("Gagal: "+error.message);return}
+    m.active=!m.active;renderMenuList();refreshMenuSelects();toast(m.active?"Menu diaktifkan":"Menu dinonaktifkan, tidak muncul lagi di pilihan");
+  }
+  if(e.target.closest("[data-mdel]")){
+    row.querySelector(".acts").innerHTML=`<span class="hint">Hapus permanen?</span><button class="btn sm danger" type="button" data-mdelyes>Ya, hapus</button><button class="btn sm ghost" type="button" data-mcancel>Batal</button>`;
+  }
+  if(e.target.closest("[data-mdelyes]")){
+    const {error}=await sb.from("menu_items").delete().eq("id",id);
+    if(error){toast("Gagal menghapus: "+error.message);return}
+    menus=menus.filter(x=>x.id!==id);renderMenuList();refreshMenuSelects();toast("Menu dihapus. Booking lama tetap menyimpan nama menunya.");
+  }
+});
 document.querySelectorAll('input[name="menutype"]').forEach(r=>r.addEventListener("change",syncMenuType));
 document.querySelectorAll('input[name="status"],input[name="dpneed"]').forEach(r=>r.addEventListener("change",syncDp));
 ["#f-dpamount","#f-price"].forEach(id=>$(id).addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}));
