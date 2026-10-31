@@ -280,6 +280,123 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
 .qlist .qli .acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 .qlist .tot{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink)}
 @media (max-width:560px){.qlist .qli{grid-template-columns:minmax(0,1fr)}.qlist .qli .acts{justify-content:flex-start}}
+
+/* ---------- tabs & views ---------- */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;margin-top:-6px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:transparent;padding:10px 14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;font-size:14px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.view{display:flex;flex-direction:column;gap:16px}
+.vhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.vhead h2{font-size:22px;font-weight:700;font-stretch:85%}
+.vhead .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.cal .dow{padding:8px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);background:var(--bg)}
+.cal .day{min-height:108px;padding:6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:3px;min-width:0}
+.cal .day:nth-child(7n){border-right:0}
+.cal .day.out{background:var(--bg);color:var(--muted)}
+.cal .day.out .dn{opacity:.5}
+.cal .day.today .dn{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:0 7px}
+.cal .day.clash{box-shadow:inset 0 0 0 2px var(--warn)}
+.cal .dn{font-size:12px;font-weight:600;align-self:flex-start;font-variant-numeric:tabular-nums}
+.cal .ev{display:block;width:100%;text-align:left;border:0;border-left:3px solid;border-radius:4px;padding:2px 5px;font-size:11.5px;line-height:1.3;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.cal .ev.early{background:var(--early-soft);border-left-color:var(--early)}
+.cal .ev.negotiation{background:var(--nego-soft);border-left-color:var(--nego)}
+.cal .ev.confirmed{background:var(--conf-soft);border-left-color:var(--conf)}
+.cal .clashtag{font-size:10.5px;font-weight:700;color:var(--warn)}
+@media (max-width:720px){.cal .day{min-height:64px;padding:4px}.cal .ev{font-size:0;padding:0;height:6px;border-left-width:0;border-radius:3px}.cal .ev.early{background:var(--early)}.cal .ev.negotiation{background:var(--nego)}.cal .ev.confirmed{background:var(--conf)}.cal .clashtag{font-size:0}.cal .clashtag::after{content:"!";font-size:11px}}
+.agenda{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.agenda .ah{padding:10px 14px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--bg);border-bottom:1px solid var(--line)}
+.agenda .ai{display:grid;grid-template-columns:90px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;border-left:4px solid transparent}
+.agenda .ai:last-child{border-bottom:0}
+.agenda .ai:hover{background:var(--bg)}
+.agenda .ai.early{border-left-color:var(--early)}.agenda .ai.negotiation{border-left-color:var(--nego)}.agenda .ai.confirmed{border-left-color:var(--conf)}
+.agenda .ai b{font-variant-numeric:tabular-nums}
+.agenda .ai .who{min-width:0}
+.agenda .ai .who h3{font-size:14px}
+.agenda .clash{color:var(--warn);font-weight:600;font-size:12px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* conflict modal */
+.clist{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.clist li{border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:8px 12px;font-size:13px}
+/* kitchen */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.kcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--conf)}
+.kcard.early{border-top-color:var(--early)}.kcard.negotiation{border-top-color:var(--nego)}
+.kcard .kh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.kcard .kh h3{font-size:16px;font-weight:700;font-stretch:90%;overflow-wrap:anywhere}
+.kcard .kh p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.kcard .kpax{text-align:right;flex:none}
+.kcard .kpax b{font-family:var(--f-display);font-size:26px;font-weight:700;font-stretch:80%;line-height:1;display:block}
+.kcard .kpax span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.kcard table{width:100%;border-collapse:collapse;font-size:13px}
+.kcard td{padding:5px 0;border-bottom:1px dashed var(--line);vertical-align:top}
+.kcard tr:last-child td{border-bottom:0}
+.kcard td.q{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+.kcard .ksub{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kcard .knote{font-size:13px;background:var(--nego-soft);border-radius:6px;padding:8px 10px;overflow-wrap:anywhere}
+.kday{font-size:13px;font-weight:700;letter-spacing:.04em;margin-top:6px}
+.ktotal{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow-x:auto}
+.ktotal table{width:100%;border-collapse:collapse;font-size:13px;min-width:420px}
+.ktotal th,.ktotal td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left}
+.ktotal th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+.ktotal td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.ktotal tr:last-child td{border-bottom:0}
+/* customers */
+.clistv{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.crow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 90px 140px auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.crow:hover{background:var(--bg)}
+.crow h3{font-size:15px;font-weight:700;font-stretch:90%;overflow-wrap:anywhere}
+.crow p{margin:2px 0 0;font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.crow .n{font-variant-numeric:tabular-nums;font-weight:600;text-align:right}
+.crow .tagv{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--conf-soft);color:var(--conf)}
+.cdetail{padding:4px 16px 16px;border-bottom:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.cdetail table{width:100%;border-collapse:collapse;font-size:13px}
+.cdetail th,.cdetail td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.cdetail th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cdetail td.n{text-align:right;font-variant-numeric:tabular-nums}
+.cdetail .wrapx{overflow-x:auto}
+@media (max-width:760px){.crow{grid-template-columns:minmax(0,1fr) auto}.crow .hide-m{display:none}}
+/* report */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.kpi{padding:14px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -1px -1px 0;display:flex;flex-direction:column;gap:2px}
+.kpi b{font-family:var(--f-display);font-size:21px;white-space:nowrap;font-weight:700;font-stretch:85%;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi span{font-size:12px;color:var(--muted)}
+.rcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.rcard h3{font-size:16px;font-weight:700;font-stretch:90%}
+.rgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){.rgrid{grid-template-columns:minmax(0,1fr)}}
+.bars{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;align-items:end;height:180px;padding-top:18px;border-bottom:1px solid var(--line);position:relative}
+.bars .b{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;min-width:0}
+.bars .b i{display:block;width:70%;max-width:38px;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px}
+.bars .b i.zero{background:var(--line)}
+.bars .b em{font-style:normal;font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.barlbl{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;font-size:11px;color:var(--muted);text-align:center}
+.rtable{overflow-x:auto}
+.rtable table{width:100%;border-collapse:collapse;font-size:13px;min-width:460px}
+.rtable th,.rtable td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.rtable th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rtable td.n,.rtable th.n{text-align:right;font-variant-numeric:tabular-nums}
+.rtable tr:last-child td{border-bottom:0}
+.rtable tfoot td{font-weight:700;border-top:2px solid var(--line)}
+.hbar{height:8px;border-radius:4px;background:var(--warn);opacity:.75}
+/* history */
+.hist{display:flex;flex-direction:column;gap:0;font-size:13px}
+.hist .hi{padding:8px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:3px}
+.hist .hi:last-child{border-bottom:0}
+.hist .hm{font-size:12px;color:var(--muted)}
+.hist .hc{overflow-wrap:anywhere}
+.hist .hc s{color:var(--muted)}
+
+.cfwrap{position:fixed;inset:0;z-index:26;background:rgb(0 0 0 / .4);display:grid;place-items:center;padding:16px}
+.cfbox{background:var(--surface);border-radius:12px;width:min(520px,100%);max-height:calc(100% - 32px);overflow:auto;box-shadow:0 20px 60px rgb(0 0 0 / .3);display:flex;flex-direction:column}
+.cfbox header{padding:14px 18px;border-bottom:1px solid var(--line)}
+.cfbox header h2{font-size:18px;font-weight:700;font-stretch:85%;color:var(--warn)}
+.cfbox .cb{padding:16px 18px;display:flex;flex-direction:column;gap:12px;font-size:14px}
+.cfbox footer{padding:12px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -341,6 +458,15 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
     </div>
   </div>
 
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Tampilan">
+    <button class="tab" type="button" role="tab" data-view="booking" aria-selected="true">Booking</button>
+    <button class="tab" type="button" role="tab" data-view="calendar">Kalender</button>
+    <button class="tab" type="button" role="tab" data-view="kitchen">Kitchen</button>
+    <button class="tab" type="button" role="tab" data-view="customers">Customer</button>
+    <button class="tab" type="button" role="tab" data-view="report">Laporan</button>
+  </nav>
+
+  <div class="view" id="view-booking">
   <div class="stats" id="stats"></div>
 
   <div class="bar">
@@ -357,6 +483,40 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
   <div id="banner" hidden></div>
   <div class="sumbar" id="sumbar"></div>
   <div class="list" id="list"></div>
+  </div>
+
+  <div class="view" id="view-calendar" hidden>
+    <div class="vhead"><h2 id="cal-title"></h2><div class="grp"><button class="btn sm" type="button" id="cal-prev" aria-label="Bulan sebelumnya">‹</button><button class="btn sm" type="button" id="cal-today">Bulan ini</button><button class="btn sm" type="button" id="cal-next" aria-label="Bulan berikutnya">›</button></div></div>
+    <div class="legend"><span><i style="background:var(--early)"></i>Early</span><span><i style="background:var(--nego)"></i>Negotiation</span><span><i style="background:var(--conf)"></i>Confirmed</span><span><i style="background:transparent;box-shadow:inset 0 0 0 2px var(--warn)"></i>Bentrok: tanggal, jam &amp; area sama</span></div>
+    <div class="cal" id="cal-grid"></div>
+    <div class="agenda" id="cal-agenda"></div>
+  </div>
+
+  <div class="view" id="view-kitchen" hidden>
+    <div class="vhead"><h2 id="kit-title"></h2><div class="grp"><button class="btn sm" type="button" id="kit-prev" aria-label="Minggu sebelumnya">‹</button><button class="btn sm" type="button" id="kit-now">Minggu ini</button><button class="btn sm" type="button" id="kit-next" aria-label="Minggu berikutnya">›</button></div></div>
+    <label class="check"><input type="checkbox" id="kit-all"> Tampilkan juga Early &amp; Negotiation (belum pasti)</label>
+    <div id="kit-cards"></div>
+    <div class="vhead"><h2 style="font-size:18px">Total porsi minggu ini</h2></div>
+    <div class="ktotal" id="kit-total"></div>
+  </div>
+
+  <div class="view" id="view-customers" hidden>
+    <div class="vhead"><h2>Customer</h2><span class="hint" id="cu-count"></span></div>
+    <input class="search" id="cu-q" style="flex:none" type="search" placeholder="Cari nama, perusahaan, telp, email…" aria-label="Cari customer">
+    <div class="clistv" id="cu-list"></div>
+  </div>
+
+  <div class="view" id="view-report" hidden>
+    <div class="vhead"><h2>Laporan penjualan</h2><div class="grp"><select class="period" id="rp-year" aria-label="Tahun"></select><button class="btn" type="button" id="rp-export">Export laporan (Excel)</button><button class="btn" type="button" id="rp-backup">Backup semua data (Excel)</button></div></div>
+    <p class="hint">Omzet dihitung dari booking Confirmed yang tidak dibatalkan, berdasarkan bulan tanggal event (termasuk service &amp; pajak bila dicentang).</p>
+    <div class="kpis" id="rp-kpis"></div>
+    <div class="rcard"><h3>Omzet confirmed per bulan</h3><div class="bars" id="rp-bars"></div><div class="barlbl" id="rp-barlbl"></div></div>
+    <div class="rcard"><h3>Per bulan</h3><div class="rtable" id="rp-months"></div></div>
+    <div class="rgrid">
+      <div class="rcard"><h3>Performa per sales</h3><div class="rtable" id="rp-sales"></div><p class="hint">Berdasarkan akun yang pertama kali membuat booking.</p></div>
+      <div class="rcard"><h3>Alasan cancel terbanyak</h3><div class="rtable" id="rp-reasons"></div></div>
+    </div>
+  </div>
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
@@ -370,8 +530,8 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
     <section class="sec">
       <div class="sec-h"><h3>Customer</h3><span>* wajib diisi</span></div>
       <div class="grid2">
-        <label class="f"><span class="lbl">Nama customer<span class="req">*</span></span><input id="f-customer" required placeholder="Yang menghubungi"></label>
-        <label class="f"><span class="lbl">Nama perusahaan</span><input id="f-company" placeholder="Opsional"></label>
+        <label class="f"><span class="lbl">Nama customer<span class="req">*</span></span><input id="f-customer" required placeholder="Yang menghubungi" list="dl-customer"></label>
+        <label class="f"><span class="lbl">Nama perusahaan</span><input id="f-company" placeholder="Opsional" list="dl-company"><datalist id="dl-company"></datalist><datalist id="dl-customer"></datalist></label>
         <label class="f"><span class="lbl">PIC hari event</span><input id="f-pic" placeholder="Nama PIC"></label>
         <label class="f"><span class="lbl">No. telp / WA<span class="req">*</span></span><input id="f-phone" type="tel" required placeholder="08…"></label>
         <label class="f span2"><span class="lbl">Email</span><input id="f-email" type="email" placeholder="Opsional"></label>
@@ -477,6 +637,10 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
       <label class="f"><span class="lbl">Special request</span><textarea id="f-special" placeholder="Alergi, dekorasi, kue ulang tahun, banner, vegetarian…"></textarea></label>
       <label class="f"><span class="lbl">Notes internal</span><textarea id="f-notes" placeholder="Follow-up, hasil negosiasi, info pelunasan…"></textarea></label>
     </section>
+    <section class="sec" id="hist-sec" hidden>
+      <div class="sec-h"><h3>Riwayat perubahan</h3></div>
+      <div class="hist" id="hist-list"></div>
+    </section>
   </form>
   <footer>
     <div class="confirm" id="del-zone"></div>
@@ -500,6 +664,7 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
     <span class="hint">Tempel ke grup Kitchen, Bar, Service, dan Finance.</span>
     <div style="display:flex;gap:8px">
       <button class="btn" type="button" data-close>Tutup</button>
+      <button class="btn" type="button" id="beo-pdf">Download PDF</button>
       <button class="btn primary" type="button" id="copy-beo">Copy BEO</button>
     </div>
   </footer>
@@ -654,11 +819,20 @@ label.f input:disabled,label.f textarea:disabled,.inp:disabled{opacity:.7;cursor
   <footer>
     <div class="grp"><span class="confirm" id="qe-delzone"></span></div>
     <div class="grp">
+      <button class="btn" type="button" id="qe-tobooking" hidden>Jadikan booking</button>
       <button class="btn" type="button" id="qe-xlsx">Export Excel</button>
       <button class="btn" type="button" id="qe-pdf">Export PDF</button>
       <button class="btn primary" type="button" id="qe-save">Simpan</button>
     </div>
   </footer>
+</div>
+
+<div class="cfwrap" id="conflict" hidden role="alertdialog" aria-labelledby="cf-title">
+  <div class="cfbox">
+    <header><h2 id="cf-title">Jadwal bentrok</h2></header>
+    <div class="cb"><p style="margin:0" id="cf-intro"></p><ul class="clist" id="cf-list"></ul><p class="hint" style="margin:0">Cek lagi jam dan area. Kalau memang bisa berjalan bersamaan (misalnya area berbeda), lanjutkan saja.</p></div>
+    <footer><button class="btn" type="button" id="cf-back">Kembali &amp; ubah</button><button class="btn primary" type="button" id="cf-go">Tetap simpan</button></footer>
+  </div>
 </div>
 
 <div class="toast" id="toast" hidden></div>
@@ -742,7 +916,7 @@ function dpState(b){
 function fromRow(r){return{id:r.id,company:r.company||"",customer:r.customer||"",pic:r.pic||"",phone:r.phone||"",email:r.email||"",
   eventDate:r.event_date||"",startTime:r.start_time||"",endTime:r.end_time||"",pax:r.pax||0,area:r.area||"",eventName:r.event_name||"",setup:r.setup||"",
   status:r.status,dpNeeded:r.dp_needed,dpAmount:r.dp_amount||0,dpDate:r.dp_date||"",dpReceived:r.dp_received,dpLink:r.dp_link||"",dpProofPath:r.dp_proof_path||"",
-  menuType:r.menu_type||"",items:r.items||[],alacarte:r.alacarte||[],pricePerPax:r.price_per_pax||0,total:r.total||0,withService:!!r.with_service,withTax:!!r.with_tax,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at,cancelledAt:r.cancelled_at||"",cancelReason:r.cancel_reason||""}}
+  menuType:r.menu_type||"",items:r.items||[],alacarte:r.alacarte||[],pricePerPax:r.price_per_pax||0,total:r.total||0,withService:!!r.with_service,withTax:!!r.with_tax,special:r.special||"",notes:r.notes||"",updatedAt:r.updated_at,cancelledAt:r.cancelled_at||"",cancelReason:r.cancel_reason||"",createdBy:r.created_by||null,createdAt:r.created_at||""}}
 function toRow(b){return{company:b.company||null,customer:b.customer,pic:b.pic||null,phone:b.phone||null,email:b.email||null,
   event_date:b.eventDate||null,start_time:b.startTime||null,end_time:b.endTime||null,pax:b.pax||0,area:b.area||null,event_name:b.eventName||null,setup:b.setup||null,
   status:b.status,dp_needed:!!b.dpNeeded,dp_amount:b.dpAmount||0,dp_date:b.dpDate||null,dp_received:!!b.dpReceived,dp_link:b.dpLink||null,dp_proof_path:b.dpProofPath||null,
@@ -760,7 +934,7 @@ async function boot(){
   $("#me-name").textContent=prof.full_name||prof.email;
   $("#me-role").textContent=ROLE_LABEL[prof.role];$("#me-role").className="role "+prof.role;
   $("#btn-new").hidden=!can.create();$("#btn-users").hidden=!can.users();$("#btn-menus").hidden=!can.menus();$("#btn-quotes").hidden=!can.quote();
-  show("#v-app");renderChips();await Promise.all([loadMenus(),loadBookings()]);subscribe();
+  show("#v-app");renderChips();setupTabs();await Promise.all([loadMenus(),loadPeople(),loadBookings()]);subscribe();
 }
 async function showLogin(){
   show("#v-login");$("#login-form").hidden=false;$("#setup-form").hidden=true;
@@ -798,7 +972,7 @@ sb.auth.onAuthStateChange((ev)=>{if(ev==="SIGNED_IN"&&!me&&location.hash.include
 async function loadBookings(){
   const {data,error}=await sb.from("bookings").select("*").order("event_date",{ascending:true});
   if(error){$("#list").innerHTML=`<div class="empty">Gagal memuat data. Muat ulang halaman.</div>`;return}
-  bookings=data.map(fromRow);render();
+  bookings=data.map(fromRow);render();renderActiveView();
   if(beoBooking){const f=bookings.find(x=>x.id===beoBooking.id);if(f){beoBooking=f;renderBeo()}}
 }
 async function loadMenus(){
@@ -1052,6 +1226,7 @@ $("#form").addEventListener("submit",async e=>{
     special:$("#f-special").value.trim(),notes:$("#f-notes").value.trim()
   };
   if(!b.customer&&editing)b.customer=editing.customer;
+  if(!(editing&&editing.cancelledAt)&&!await confirmConflicts(b,editing?.id))return;
   const btn=$("#save-btn");btn.disabled=true;btn.textContent="Menyimpan…";
   const q=editing?sb.from("bookings").update(toRow(b)).eq("id",editing.id):sb.from("bookings").insert(toRow(b));
   const {error}=await q;
@@ -1266,7 +1441,7 @@ document.querySelectorAll('input[name="status"],input[name="dpneed"]').forEach(r
 ["#f-dpamount","#f-price"].forEach(id=>$(id).addEventListener("blur",e=>{const n=num(e.target.value);e.target.value=n?n.toLocaleString("id-ID"):""}));
 $("#scrim").onclick=closeAll;
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeAll);
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#qedit").hidden){qClose();return}if(!$("#cancel").hidden){$("#cancel").hidden=true;cancelTarget=null;return}if(!$("#scrim").hidden)closeAll()});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("#conflict").hidden){$("#cf-back").click();return}if(!$("#qedit").hidden){qClose();return}if(!$("#cancel").hidden){$("#cancel").hidden=true;cancelTarget=null;return}if(!$("#scrim").hidden)closeAll()});
 $("#q").addEventListener("input",e=>{filter.q=e.target.value;render()});
 $("#period").addEventListener("change",e=>{filter.period=e.target.value;render()});
 $("#chips").addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c)return;filter.status=c.dataset.v;renderChips();render()});
@@ -1626,6 +1801,373 @@ async function qBuildXlsx(q){
   ws.pageSetup.printArea=`A1:G${r+1}`;
   return wb.xlsx.writeBuffer();
 }
+
+
+/* ================= VIEWS ================= */
+can.report=()=>["master_admin","admin"].includes(me?.role);
+can.customers=()=>["master_admin","admin","sales"].includes(me?.role);
+can.history=()=>["master_admin","admin","sales","finance"].includes(me?.role);
+let curView="booking", people={};
+const VIEWS=["booking","calendar","kitchen","customers","report"];
+function viewAllowed(v){return v==="customers"?can.customers():v==="report"?can.report():true}
+function setupTabs(){
+  document.querySelectorAll("#tabs .tab").forEach(t=>t.hidden=!viewAllowed(t.dataset.view));
+  setView(me?.role==="ops"?"kitchen":"booking");
+}
+function setView(v){
+  if(!viewAllowed(v))v="booking";curView=v;
+  VIEWS.forEach(x=>{$("#view-"+x).hidden=x!==v});
+  document.querySelectorAll("#tabs .tab").forEach(t=>t.setAttribute("aria-selected",String(t.dataset.view===v)));
+  renderActiveView();
+}
+function renderActiveView(){
+  fillCustomerLists();
+  if(curView==="calendar")renderCalendar();
+  else if(curView==="kitchen")renderKitchen();
+  else if(curView==="customers")renderCustomers();
+  else if(curView==="report")renderReport();
+}
+$("#tabs").addEventListener("click",e=>{const t=e.target.closest(".tab");if(t)setView(t.dataset.view)});
+async function loadPeople(){
+  const {data}=await sb.from("profiles").select("id,full_name,email");
+  people={};(data||[]).forEach(p=>people[p.id]=p.full_name||p.email);
+}
+const personName=id=>id?(people[id]||"Akun terhapus"):"—";
+const dstr=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const active=()=>bookings.filter(b=>!b.cancelledAt);
+const bName=b=>b.company||b.customer||"(Tanpa nama)";
+
+/* ================= CONFLICTS ================= */
+function evRange(b){
+  const tm=s=>{if(!s)return null;const[h,m]=s.split(":").map(Number);return isNaN(h)?null:h*60+(m||0)};
+  let s=tm(b.startTime),e=tm(b.endTime);
+  if(s==null)return[0,1440];
+  if(e==null)e=s+240;if(e<=s)e+=1440;return[s,e];
+}
+const areaKey=a=>String(a||"").trim().toLowerCase().replace(/\s+/g," ");
+function areasClash(a,b){const x=areaKey(a),y=areaKey(b);if(!x||!y)return true;const full=/full|seluruh|semua|whole/;if(full.test(x)||full.test(y))return true;return x===y}
+function findConflicts(b,excludeId){
+  if(!b.eventDate)return[];const r=evRange(b);
+  return active().filter(o=>o.id!==excludeId&&o.eventDate===b.eventDate&&areasClash(o.area,b.area)&&(()=>{const q=evRange(o);return q[0]<r[1]&&r[0]<q[1]})());
+}
+function confirmConflicts(b,excludeId){
+  const list=findConflicts(b,excludeId);
+  if(!list.length)return Promise.resolve(true);
+  $("#cf-list").innerHTML=list.map(o=>`<li><b>${esc(bName(o))}</b> · ${STATUS[o.status]?.label||""}<br>${shortDate(o.eventDate)} · ${o.startTime?esc(o.startTime)+(o.endTime?"–"+esc(o.endTime):""):"jam belum diisi"} · area: ${esc(o.area||"belum diisi")} · ${+o.pax||0} pax</li>`).join("");
+  $("#cf-intro").innerHTML=`Booking <b>${esc(bName(b))}</b> (${shortDate(b.eventDate)}${b.startTime?", "+esc(b.startTime)+(b.endTime?"–"+esc(b.endTime):""):""}, area ${esc(b.area||"belum diisi")}) bentrok dengan:`;
+  $("#conflict").hidden=false;$("#cf-back").focus();
+  return new Promise(res=>{
+    const done=v=>{$("#conflict").hidden=true;$("#cf-back").onclick=$("#cf-go").onclick=null;res(v)};
+    $("#cf-back").onclick=()=>done(false);$("#cf-go").onclick=()=>done(true);
+  });
+}
+
+/* ================= CALENDAR ================= */
+let calMonth=(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)})();
+function clashIds(list){
+  const ids=new Set();
+  for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];
+    if(a.eventDate===b.eventDate&&areasClash(a.area,b.area)){const x=evRange(a),y=evRange(b);if(x[0]<y[1]&&y[0]<x[1]){ids.add(a.id);ids.add(b.id)}}}
+  return ids;
+}
+function renderCalendar(){
+  const y=calMonth.getFullYear(),m=calMonth.getMonth();
+  $("#cal-title").textContent=`${MONTHS_L[m]} ${y}`;
+  const first=new Date(y,m,1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+  const last=new Date(y,m+1,0),end=new Date(last);end.setDate(last.getDate()+(7-((last.getDay()+6)%7))-1);
+  const ev=active().filter(b=>b.eventDate);
+  const byDay={};ev.forEach(b=>(byDay[b.eventDate]=byDay[b.eventDate]||[]).push(b));
+  Object.values(byDay).forEach(l=>l.sort((a,b)=>evRange(a)[0]-evRange(b)[0]));
+  const clash=clashIds(ev),td=today();
+  let html=["Sen","Sel","Rab","Kam","Jum","Sab","Min"].map(d=>`<div class="dow">${d}</div>`).join("");
+  for(const d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    const k=dstr(d),list=byDay[k]||[],hasClash=list.some(b=>clash.has(b.id));
+    html+=`<div class="day${d.getMonth()!==m?" out":""}${k===td?" today":""}${hasClash?" clash":""}"><span class="dn">${d.getDate()}</span>${hasClash?`<span class="clashtag">Bentrok</span>`:""}${list.map(b=>`<button type="button" class="ev ${b.status}" data-open="${b.id}" title="${esc(bName(b))} · ${b.startTime||"—"} · ${b.area||"area ?"} · ${+b.pax||0} pax">${b.startTime?esc(b.startTime)+" ":""}${esc(bName(b))} · ${+b.pax||0}p</button>`).join("")}</div>`;
+  }
+  $("#cal-grid").innerHTML=html;
+  const month=ev.filter(b=>{const d=parseD(b.eventDate);return d.getFullYear()===y&&d.getMonth()===m}).sort((a,b)=>a.eventDate.localeCompare(b.eventDate)||evRange(a)[0]-evRange(b)[0]);
+  $("#cal-agenda").innerHTML=`<div class="ah">${month.length} event di ${MONTHS_L[m]} ${y}</div>`+(month.length?month.map(b=>{const d=parseD(b.eventDate);
+    return `<div class="ai ${b.status}" data-open="${b.id}"><b>${DAYS[d.getDay()].slice(0,3)}, ${d.getDate()} ${MONTHS[d.getMonth()]}</b><div class="who"><h3>${esc(bName(b))}</h3><p>${b.startTime?esc(b.startTime)+(b.endTime?"–"+esc(b.endTime):""):"Jam belum diisi"} · ${esc(b.area||"Area belum diisi")} · ${+b.pax||0} pax · ${STATUS[b.status].label}</p>${clash.has(b.id)?`<span class="clash">Bentrok jadwal/area dengan event lain</span>`:""}</div><span class="amt">${bTotal(b)?rp(bTotal(b)):""}</span></div>`}).join(""):`<div class="empty" style="padding:24px">Belum ada event di bulan ini.</div>`);
+}
+$("#cal-prev").onclick=()=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);renderCalendar()};
+$("#cal-next").onclick=()=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);renderCalendar()};
+$("#cal-today").onclick=()=>{const d=new Date();calMonth=new Date(d.getFullYear(),d.getMonth(),1);renderCalendar()};
+document.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(!o||!o.closest("#view-calendar,#view-kitchen,#view-customers"))return;const b=bookings.find(x=>x.id===o.dataset.open);if(b)openForm(b)});
+
+/* ================= KITCHEN ================= */
+let kitWeek=(()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d})();
+function bookingLines(b){
+  const out=[];
+  if(b.menuType!==OTS)(b.items||[]).filter(i=>i.name).forEach(i=>out.push({name:i.name,qty:i.qty,note:i.note||"",kind:b.menuType===PO?"Pre-order":"Prasmanan"}));
+  if(b.menuType==="Prasmanan")(b.alacarte||[]).filter(i=>i.name).forEach(i=>out.push({name:i.name,qty:i.qty,note:"",kind:"À la carte"}));
+  return out;
+}
+function renderKitchen(){
+  const s=new Date(kitWeek),e=new Date(kitWeek);e.setDate(e.getDate()+6);
+  $("#kit-title").textContent=`${s.getDate()} ${MONTHS[s.getMonth()]} – ${e.getDate()} ${MONTHS[e.getMonth()]} ${e.getFullYear()}`;
+  const all=$("#kit-all").checked,from=dstr(s),to=dstr(e);
+  const list=active().filter(b=>b.eventDate&&b.eventDate>=from&&b.eventDate<=to&&(all||b.status==="confirmed")).sort((a,b)=>a.eventDate.localeCompare(b.eventDate)||evRange(a)[0]-evRange(b)[0]);
+  if(!list.length){$("#kit-cards").innerHTML=`<div class="empty" style="border:1px solid var(--line);border-radius:var(--r);background:var(--surface)"><h3>Tidak ada event ${all?"":"confirmed "}minggu ini</h3><p>${all?"":"Centang \"Tampilkan Early & Negotiation\" untuk melihat event yang belum pasti."}</p></div>`;$("#kit-total").innerHTML="";return}
+  let html="",lastDay="";const agg={};
+  list.forEach(b=>{
+    if(b.eventDate!==lastDay){lastDay=b.eventDate;html+=(html?"</div>":"")+`<div class="kday">${longDate(b.eventDate)}</div><div class="kgrid">`}
+    const lines=bookingLines(b);
+    lines.forEach(l=>{const k=l.name.trim().toLowerCase();agg[k]=agg[k]||{name:l.name.trim(),qty:0,events:new Set(),kinds:new Set()};agg[k].qty+=num(l.qty);agg[k].events.add(b.id);agg[k].kinds.add(l.kind)});
+    const notes=[b.special&&("Special request: "+b.special),b.setup&&("Setup: "+b.setup)].filter(Boolean);
+    html+=`<article class="kcard ${b.status}">
+      <div class="kh"><div><h3>${esc(bName(b))}</h3><p>${b.startTime?esc(b.startTime)+(b.endTime?"–"+esc(b.endTime):""):"Jam belum diisi"} · ${esc(b.area||"Area belum diisi")}${b.eventName?" · "+esc(b.eventName):""}</p><p>${esc(b.menuType||"-")}${b.status!=="confirmed"?` · <b style="color:var(--nego)">${STATUS[b.status].label}, belum pasti</b>`:""}</p></div><div class="kpax"><b>${+b.pax||0}</b><span>pax</span></div></div>
+      ${b.menuType===OTS?`<p class="hint">Menu dipesan langsung di tempat (on the spot).</p>`:lines.length?`<table>${lines.map(l=>`<tr><td>${esc(l.name)}${l.note?` <span class="hint">(${esc(l.note)})</span>`:""}${l.kind==="À la carte"?` <span class="hint">· à la carte</span>`:""}</td><td class="q">${esc(l.qty||"-")}${/^\d+$/.test(String(l.qty).trim())?" porsi":""}</td></tr>`).join("")}</table>`:`<p class="hint">Menu belum diisi.</p>`}
+      ${notes.map(n=>`<div class="knote">${esc(n)}</div>`).join("")}
+      <div><button class="btn sm ghost" type="button" data-open="${b.id}">Lihat detail</button></div>
+    </article>`;
+  });
+  $("#kit-cards").innerHTML=html+"</div>";
+  const rows=Object.values(agg).sort((a,b)=>b.qty-a.qty||a.name.localeCompare(b.name));
+  $("#kit-total").innerHTML=rows.length?`<table><thead><tr><th>Menu</th><th>Jenis</th><th class="n">Event</th><th class="n">Total porsi</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${[...r.kinds].join(", ")}</td><td class="n">${r.events.size}</td><td class="n">${r.qty?r.qty.toLocaleString("id-ID"):"-"}</td></tr>`).join("")}</tbody></table>`:"";
+}
+$("#kit-prev").onclick=()=>{kitWeek.setDate(kitWeek.getDate()-7);renderKitchen()};
+$("#kit-next").onclick=()=>{kitWeek.setDate(kitWeek.getDate()+7);renderKitchen()};
+$("#kit-now").onclick=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));kitWeek=d;renderKitchen()};
+$("#kit-all").addEventListener("change",renderKitchen);
+
+/* ================= CUSTOMERS ================= */
+const digits=s=>String(s||"").replace(/\D/g,"");
+function custKey(b){return b.company?"c:"+b.company.trim().toLowerCase():"p:"+(digits(b.phone)||b.customer.trim().toLowerCase())}
+function buildCustomers(){
+  const map={};
+  [...bookings].sort((a,b)=>(a.createdAt||"").localeCompare(b.createdAt||"")).forEach(b=>{
+    const k=custKey(b);const c=map[k]=map[k]||{key:k,name:bName(b),company:b.company,bookings:[]};
+    c.bookings.push(b);
+    if(b.customer)c.customer=b.customer;if(b.pic)c.pic=b.pic;if(b.phone)c.phone=b.phone;if(b.email)c.email=b.email;if(b.company)c.company=b.company;c.name=bName(b);
+  });
+  return Object.values(map).map(c=>{
+    const act=c.bookings.filter(b=>!b.cancelledAt),conf=act.filter(b=>b.status==="confirmed");
+    const dates=act.map(b=>b.eventDate).filter(Boolean).sort();
+    return{...c,events:act.length,confirmed:conf.length,revenue:conf.reduce((a,b)=>a+bTotal(b),0),lastEvent:dates[dates.length-1]||"",cancelled:c.bookings.length-act.length};
+  }).sort((a,b)=>(b.lastEvent||"").localeCompare(a.lastEvent||"")||a.name.localeCompare(b.name));
+}
+let openCust=null;
+function renderCustomers(){
+  const q=$("#cu-q").value.trim().toLowerCase(),list=buildCustomers().filter(c=>!q||[c.name,c.customer,c.pic,c.phone,c.email].join(" ").toLowerCase().includes(q));
+  $("#cu-count").textContent=`${list.length} customer`;
+  $("#cu-list").innerHTML=list.length?list.map(c=>`<div class="crow" data-ck="${esc(c.key)}">
+      <div><h3>${esc(c.name)} ${c.confirmed>1?`<span class="tagv">Langganan</span>`:""}</h3><p>${c.company?esc(c.customer||"-")+" · ":""}${esc(c.phone||"-")}${c.email?" · "+esc(c.email):""}</p></div>
+      <div class="hide-m"><p>Event terakhir</p><b style="font-size:13px">${c.lastEvent?shortDate(c.lastEvent):"-"}</b></div>
+      <div class="n hide-m">${c.events} event</div>
+      <div class="n">${c.revenue?rp(c.revenue):"-"}</div>
+      <div><button class="btn sm ghost" type="button" data-cnew>Booking baru</button></div>
+    </div>${openCust===c.key?`<div class="cdetail"><div class="wrapx"><table><thead><tr><th>Tanggal</th><th>Acara</th><th>Status</th><th class="n">Pax</th><th class="n">Nilai</th><th></th></tr></thead><tbody>${[...c.bookings].sort((a,b)=>(b.eventDate||"").localeCompare(a.eventDate||"")).map(b=>`<tr><td>${b.eventDate?shortDate(b.eventDate):"-"}</td><td>${esc(b.eventName||b.menuType||"-")}</td><td>${b.cancelledAt?"Dibatalkan":STATUS[b.status].label}</td><td class="n">${+b.pax||0}</td><td class="n">${bTotal(b)?rp(bTotal(b)):"-"}</td><td><button class="btn sm ghost" type="button" data-open="${b.id}">Buka</button></td></tr>`).join("")}</tbody></table></div><p class="hint">PIC terakhir: ${esc(c.pic||"-")} · ${c.confirmed} event confirmed${c.cancelled?` · ${c.cancelled} dibatalkan`:""}</p></div>`:""}`).join("")
+   :`<div class="empty"><h3>${q?"Tidak ada customer yang cocok":"Belum ada customer"}</h3><p>Customer tersimpan otomatis dari setiap booking.</p></div>`;
+}
+$("#cu-q").addEventListener("input",renderCustomers);
+$("#cu-list").addEventListener("click",e=>{
+  if(e.target.closest("[data-open]"))return;
+  const row=e.target.closest("[data-ck]");if(!row)return;const k=row.dataset.ck;
+  if(e.target.closest("[data-cnew]")){const c=buildCustomers().find(x=>x.key===k);if(c)newBookingFor(c);return}
+  openCust=openCust===k?null:k;renderCustomers();
+});
+function newBookingFor(c){
+  openForm(null);
+  $("#f-company").value=c.company||"";$("#f-customer").value=c.customer||"";$("#f-pic").value=c.pic||"";$("#f-phone").value=c.phone||"";$("#f-email").value=c.email||"";
+}
+function fillCustomerLists(){
+  const cs=buildCustomers();
+  $("#dl-company").innerHTML=[...new Set(cs.map(c=>c.company).filter(Boolean))].map(n=>`<option value="${esc(n)}"></option>`).join("");
+  $("#dl-customer").innerHTML=[...new Map(bookings.filter(b=>b.customer).map(b=>[b.customer.trim().toLowerCase(),b])).values()].map(b=>`<option value="${esc(b.customer)}">${esc([b.company,b.phone].filter(Boolean).join(" · "))}</option>`).join("");
+}
+function autofillFrom(field){
+  if(editing)return;
+  const v=$(field==="company"?"#f-company":"#f-customer").value.trim().toLowerCase();if(!v)return;
+  const match=[...bookings].filter(b=>(field==="company"?b.company:b.customer).trim().toLowerCase()===v).sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""))[0];
+  if(!match)return;
+  const fill=(id,val)=>{if(val&&!$(id).value.trim())$(id).value=val};
+  fill("#f-customer",match.customer);fill("#f-company",match.company);fill("#f-pic",match.pic);fill("#f-phone",match.phone);fill("#f-email",match.email);
+  toast("Data customer terisi dari booking sebelumnya");
+}
+$("#f-company").addEventListener("change",()=>autofillFrom("company"));
+$("#f-customer").addEventListener("change",()=>autofillFrom("customer"));
+
+/* ================= REPORT ================= */
+let repYear=new Date().getFullYear();
+function reportData(year){
+  const inYear=b=>{const d=b.eventDate||String(b.createdAt||"").slice(0,10);return d&&Number(d.slice(0,4))===year};
+  const all=bookings.filter(inYear),act=all.filter(b=>!b.cancelledAt),conf=act.filter(b=>b.status==="confirmed"),pipe=act.filter(b=>b.status!=="confirmed"),cx=all.filter(b=>b.cancelledAt);
+  const months=Array.from({length:12},(_,i)=>({m:i,events:0,revenue:0,pipeline:0,cancelled:0,pax:0}));
+  const mi=b=>{const d=b.eventDate||String(b.createdAt||"").slice(0,10);return Number(d.slice(5,7))-1};
+  conf.forEach(b=>{const x=months[mi(b)];x.events++;x.revenue+=bTotal(b);x.pax+=+b.pax||0});
+  pipe.forEach(b=>{months[mi(b)].pipeline+=bTotal(b)});
+  cx.forEach(b=>{months[mi(b)].cancelled++});
+  const sales={};all.forEach(b=>{const k=b.createdBy||"-";const s=sales[k]=sales[k]||{id:k,name:personName(b.createdBy),total:0,confirmed:0,cancelled:0,revenue:0,pipeline:0};
+    s.total++;if(b.cancelledAt)s.cancelled++;else if(b.status==="confirmed"){s.confirmed++;s.revenue+=bTotal(b)}else s.pipeline+=bTotal(b)});
+  const reasons={};cx.forEach(b=>{const r=(b.cancelReason||"").trim();const k=r.toLowerCase()||"__none";reasons[k]=reasons[k]||{reason:r||"Tanpa alasan",count:0,value:0};reasons[k].count++;reasons[k].value+=bTotal(b)});
+  const revenue=conf.reduce((a,b)=>a+bTotal(b),0);
+  return{all,act,conf,pipe,cx,months,revenue,pipeline:pipe.reduce((a,b)=>a+bTotal(b),0),conv:all.length?conf.length/all.length:0,avg:conf.length?revenue/conf.length:0,
+    sales:Object.values(sales).sort((a,b)=>b.revenue-a.revenue||b.total-a.total),reasons:Object.values(reasons).sort((a,b)=>b.count-a.count)};
+}
+const pct=v=>(v*100).toLocaleString("id-ID",{maximumFractionDigits:1})+"%";
+const short=n=>n>=1e9?(n/1e9).toLocaleString("id-ID",{maximumFractionDigits:1})+" M":n>=1e6?(n/1e6).toLocaleString("id-ID",{maximumFractionDigits:1})+" jt":n>=1e3?Math.round(n/1e3)+" rb":String(n);
+function renderReport(){
+  const years=new Set([new Date().getFullYear()]);bookings.forEach(b=>{const d=b.eventDate||String(b.createdAt||"").slice(0,10);if(d)years.add(Number(d.slice(0,4)))});
+  const ys=[...years].sort((a,b)=>b-a);if(!ys.includes(repYear))repYear=ys[0];
+  $("#rp-year").innerHTML=ys.map(y=>`<option value="${y}"${y===repYear?" selected":""}>${y}</option>`).join("");
+  const r=reportData(repYear);
+  $("#rp-kpis").innerHTML=[[rp(r.revenue)||"Rp 0","Omzet confirmed"],[r.conf.length,"Event confirmed"],[pct(r.conv),`Konversi ke Confirmed (${r.conf.length} dari ${r.all.length} booking)`],[rp(Math.round(r.avg))||"Rp 0","Rata-rata nilai event"],[rp(r.pipeline)||"Rp 0",`Pipeline Early + Negotiation (${r.pipe.length})`],[r.cx.length,"Dibatalkan"]]
+    .map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+  const max=Math.max(1,...r.months.map(x=>x.revenue));
+  $("#rp-bars").innerHTML=r.months.map(x=>`<div class="b" title="${MONTHS_L[x.m]}: ${rp(x.revenue)||"Rp 0"} · ${x.events} event"><em>${x.revenue?short(x.revenue):""}</em><i class="${x.revenue?"":"zero"}" style="height:${x.revenue?Math.max(3,x.revenue/max*100):1}%"></i></div>`).join("");
+  $("#rp-barlbl").innerHTML=MONTHS.map(m=>`<span>${m}</span>`).join("");
+  const tot=r.months.reduce((a,x)=>({events:a.events+x.events,revenue:a.revenue+x.revenue,pipeline:a.pipeline+x.pipeline,cancelled:a.cancelled+x.cancelled,pax:a.pax+x.pax}),{events:0,revenue:0,pipeline:0,cancelled:0,pax:0});
+  $("#rp-months").innerHTML=`<table><thead><tr><th>Bulan</th><th class="n">Event</th><th class="n">Pax</th><th class="n">Omzet confirmed</th><th class="n">Pipeline</th><th class="n">Batal</th></tr></thead><tbody>${r.months.map(x=>`<tr><td>${MONTHS_L[x.m]}</td><td class="n">${x.events||"-"}</td><td class="n">${x.pax?x.pax.toLocaleString("id-ID"):"-"}</td><td class="n">${x.revenue?rp(x.revenue):"-"}</td><td class="n">${x.pipeline?rp(x.pipeline):"-"}</td><td class="n">${x.cancelled||"-"}</td></tr>`).join("")}</tbody><tfoot><tr><td>Total</td><td class="n">${tot.events}</td><td class="n">${tot.pax.toLocaleString("id-ID")}</td><td class="n">${rp(tot.revenue)||"Rp 0"}</td><td class="n">${rp(tot.pipeline)||"Rp 0"}</td><td class="n">${tot.cancelled}</td></tr></tfoot></table>`;
+  $("#rp-sales").innerHTML=r.sales.length?`<table><thead><tr><th>Dibuat oleh</th><th class="n">Booking</th><th class="n">Confirmed</th><th class="n">Batal</th><th class="n">Konversi</th><th class="n">Omzet</th></tr></thead><tbody>${r.sales.map(s=>`<tr><td>${esc(s.name)}</td><td class="n">${s.total}</td><td class="n">${s.confirmed}</td><td class="n">${s.cancelled}</td><td class="n">${pct(s.total?s.confirmed/s.total:0)}</td><td class="n">${s.revenue?rp(s.revenue):"-"}</td></tr>`).join("")}</tbody></table>`:`<p class="hint">Belum ada data.</p>`;
+  const rmax=Math.max(1,...r.reasons.map(x=>x.count));
+  $("#rp-reasons").innerHTML=r.reasons.length?`<table><thead><tr><th>Alasan</th><th class="n">Jumlah</th><th style="width:30%"></th><th class="n">Nilai batal</th></tr></thead><tbody>${r.reasons.map(x=>`<tr><td>${esc(x.reason)}</td><td class="n">${x.count}</td><td><div class="hbar" style="width:${x.count/rmax*100}%"></div></td><td class="n">${x.value?rp(x.value):"-"}</td></tr>`).join("")}</tbody></table>`:`<p class="hint">Tidak ada booking yang dibatalkan di ${repYear}.</p>`;
+}
+$("#rp-year").addEventListener("change",e=>{repYear=Number(e.target.value);renderReport()});
+
+/* ---------- Excel helpers ---------- */
+async function xlsxBook(){await loadLib(EXCELJS_URLS);const wb=new ExcelJS.Workbook();wb.creator="Rusty Rabbit";wb.created=new Date();return wb}
+function xlsxSheet(wb,name,cols,rows,opt={}){
+  const ws=wb.addWorksheet(name,{views:[{state:"frozen",ySplit:1}]});
+  ws.columns=cols.map(c=>({header:c.h,key:c.k,width:c.w||14,style:c.money?{numFmt:"#,##0"}:c.pct?{numFmt:"0.0%"}:{}}));
+  rows.forEach(r=>ws.addRow(r));
+  const h=ws.getRow(1);h.font={bold:true,color:{argb:"FFFFFFFF"}};h.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FFB0441A"}};h.alignment={vertical:"middle"};h.height=20;
+  if(opt.total){const r=ws.addRow(opt.total);r.font={bold:true};r.border={top:{style:"thin"}}}
+  ws.autoFilter={from:{row:1,column:1},to:{row:1,column:cols.length}};
+  return ws;
+}
+async function saveWb(wb,name){const buf=await wb.xlsx.writeBuffer();downloadBlob(new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),name)}
+$("#rp-export").onclick=async()=>{
+  toast("Menyiapkan laporan…");
+  try{
+    const r=reportData(repYear),wb=await xlsxBook();
+    xlsxSheet(wb,"Ringkasan",[{h:"Metrik",k:"a",w:42},{h:"Nilai",k:"b",w:22}],[
+      {a:"Tahun",b:repYear},{a:"Omzet confirmed (Rp)",b:r.revenue},{a:"Event confirmed",b:r.conf.length},{a:"Total booking (termasuk batal)",b:r.all.length},
+      {a:"Konversi ke Confirmed",b:r.conv},{a:"Rata-rata nilai event (Rp)",b:Math.round(r.avg)},{a:"Pipeline Early + Negotiation (Rp)",b:r.pipeline},{a:"Booking dibatalkan",b:r.cx.length}]);
+    const ws0=wb.getWorksheet("Ringkasan");[3,7,8].forEach(i=>ws0.getCell("B"+i).numFmt="#,##0");ws0.getCell("B6").numFmt="0.0%";
+    xlsxSheet(wb,"Per Bulan",[{h:"Bulan",k:"m",w:14},{h:"Event confirmed",k:"e"},{h:"Pax",k:"p"},{h:"Omzet confirmed",k:"r",w:18,money:true},{h:"Pipeline",k:"pl",w:18,money:true},{h:"Dibatalkan",k:"c"}],
+      r.months.map(x=>({m:MONTHS_L[x.m],e:x.events,p:x.pax,r:x.revenue,pl:x.pipeline,c:x.cancelled})),
+      {total:{m:"Total",e:{formula:"SUM(B2:B13)"},p:{formula:"SUM(C2:C13)"},r:{formula:"SUM(D2:D13)"},pl:{formula:"SUM(E2:E13)"},c:{formula:"SUM(F2:F13)"}}});
+    xlsxSheet(wb,"Per Sales",[{h:"Dibuat oleh",k:"n",w:26},{h:"Booking",k:"t"},{h:"Confirmed",k:"c"},{h:"Dibatalkan",k:"x"},{h:"Konversi",k:"v",pct:true},{h:"Omzet confirmed",k:"r",w:18,money:true},{h:"Pipeline",k:"p",w:18,money:true}],
+      r.sales.map(s=>({n:s.name,t:s.total,c:s.confirmed,x:s.cancelled,v:s.total?s.confirmed/s.total:0,r:s.revenue,p:s.pipeline})));
+    xlsxSheet(wb,"Alasan Cancel",[{h:"Alasan",k:"a",w:50},{h:"Jumlah",k:"c"},{h:"Nilai batal",k:"v",w:18,money:true}],r.reasons.map(x=>({a:x.reason,c:x.count,v:x.value})));
+    await saveWb(wb,`Laporan Penjualan Rusty Rabbit ${repYear}.xlsx`);toast("Laporan terdownload");
+  }catch(e){console.error(e);toast("Gagal membuat laporan: "+e.message)}
+};
+
+/* ================= BACKUP ================= */
+$("#rp-backup").onclick=async()=>{
+  toast("Menyiapkan backup…");
+  try{
+    const wb=await xlsxBook();
+    const st=b=>b.cancelledAt?"Dibatalkan":STATUS[b.status]?.label||b.status;
+    xlsxSheet(wb,"Booking",[
+      {h:"ID",k:"id",w:10},{h:"Tanggal event",k:"date",w:13},{h:"Jam mulai",k:"ts",w:9},{h:"Jam selesai",k:"te",w:9},{h:"Status",k:"st",w:12},{h:"Perusahaan",k:"co",w:26},{h:"Customer",k:"cu",w:20},{h:"PIC",k:"pic",w:16},{h:"Telp",k:"ph",w:15},{h:"Email",k:"em",w:22},
+      {h:"Jenis acara",k:"ev",w:18},{h:"Area",k:"ar",w:14},{h:"Setup",k:"su",w:28},{h:"Pax",k:"pax",w:7},{h:"Tipe menu",k:"mt",w:12},{h:"Harga/pax",k:"pp",money:true},{h:"Service 7%",k:"sv",w:10},{h:"Pajak 10%",k:"tx",w:10},{h:"Total",k:"tot",w:16,money:true},
+      {h:"Perlu DP",k:"dn",w:9},{h:"Nominal DP",k:"da",money:true},{h:"Tgl DP",k:"dd",w:12},{h:"DP diterima",k:"dr",w:11},{h:"Link bukti DP",k:"dl",w:24},{h:"Special request",k:"sp",w:30},{h:"Notes",k:"no",w:30},
+      {h:"Dibatalkan pada",k:"ca",w:18},{h:"Alasan batal",k:"cr",w:26},{h:"Dibuat oleh",k:"cb",w:18},{h:"Dibuat",k:"cat",w:18},{h:"Terakhir diubah",k:"ua",w:18}],
+      [...bookings].sort((a,b)=>(a.eventDate||"").localeCompare(b.eventDate||"")).map(b=>({id:b.id.slice(0,8),date:b.eventDate,ts:b.startTime,te:b.endTime,st:st(b),co:b.company,cu:b.customer,pic:b.pic,ph:b.phone,em:b.email,ev:b.eventName,ar:b.area,su:b.setup,pax:+b.pax||0,mt:b.menuType,pp:b.pricePerPax,
+        sv:b.withService?"Ya":"Tidak",tx:b.withTax?"Ya":"Tidak",tot:bTotal(b),dn:b.dpNeeded?"Ya":"Tidak",da:b.dpAmount,dd:b.dpDate,dr:b.dpReceived?"Ya":"Tidak",dl:b.dpLink,sp:b.special,no:b.notes,
+        ca:b.cancelledAt?new Date(b.cancelledAt).toLocaleString("id-ID"):"",cr:b.cancelReason,cb:personName(b.createdBy),cat:b.createdAt?new Date(b.createdAt).toLocaleString("id-ID"):"",ua:b.updatedAt?new Date(b.updatedAt).toLocaleString("id-ID"):""})));
+    const lines=[];bookings.forEach(b=>{bookingLines(b).forEach(l=>{const it=[...(b.items||[]),...(b.alacarte||[])].find(i=>i.name===l.name)||{};lines.push({id:b.id.slice(0,8),date:b.eventDate,co:bName(b),kind:l.kind,name:l.name,qty:num(l.qty)||l.qty,price:num(it.price)||null,note:l.note})})});
+    xlsxSheet(wb,"Menu per Booking",[{h:"ID booking",k:"id",w:10},{h:"Tanggal event",k:"date",w:13},{h:"Customer",k:"co",w:26},{h:"Jenis",k:"kind",w:12},{h:"Menu",k:"name",w:30},{h:"Qty",k:"qty",w:8},{h:"Harga",k:"price",money:true},{h:"Catatan",k:"note",w:24}],lines);
+    xlsxSheet(wb,"Customer",[{h:"Nama",k:"n",w:28},{h:"Kontak",k:"c",w:20},{h:"PIC",k:"p",w:18},{h:"Telp",k:"ph",w:16},{h:"Email",k:"e",w:24},{h:"Event",k:"ev",w:8},{h:"Confirmed",k:"cf",w:10},{h:"Omzet confirmed",k:"r",w:18,money:true},{h:"Event terakhir",k:"l",w:14}],
+      buildCustomers().map(c=>({n:c.name,c:c.customer,p:c.pic,ph:c.phone,e:c.email,ev:c.events,cf:c.confirmed,r:c.revenue,l:c.lastEvent})));
+    const {data:qs}=await sb.from("quotations").select("*").order("created_at");
+    if(qs)xlsxSheet(wb,"Quotation",[{h:"Nomor",k:"n",w:20},{h:"Tanggal",k:"d",w:12},{h:"Billed to",k:"b",w:28},{h:"Tanggal reservasi",k:"r",w:14},{h:"Total",k:"t",w:16,money:true},{h:"Terhubung ke booking",k:"l",w:12}],
+      qs.map(q=>({n:q.number,d:q.quote_date,b:q.billed_to,r:(q.data||{}).resDate||"",t:q.total,l:q.booking_id?"Ya":"Tidak"})));
+    const {data:ms}=await sb.from("menu_items").select("name,active").order("name");
+    if(ms)xlsxSheet(wb,"Daftar Menu",[{h:"Menu prasmanan",k:"n",w:32},{h:"Aktif",k:"a",w:8}],ms.map(m=>({n:m.name,a:m.active?"Ya":"Tidak"})));
+    await saveWb(wb,`Backup Rusty Rabbit Events ${today()}.xlsx`);toast("Backup terdownload");
+  }catch(e){console.error(e);toast("Gagal membuat backup: "+e.message)}
+};
+
+/* ================= BEO PDF ================= */
+$("#beo-pdf").onclick=async()=>{
+  if(!beoBooking)return;const b=beoBooking;toast("Menyiapkan PDF…");
+  try{
+    await loadLib(JSPDF_URLS);const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:"pt",format:"a4"});
+    const lines=buildBeo(b,false).split("\n");let y=56;const X=50,W=495,LH=13.5;
+    lines.forEach((l,i)=>{
+      if(y>790){doc.addPage();y=56}
+      if(/^-{5,}$/.test(l)){doc.setDrawColor(150);doc.setLineWidth(.6);doc.line(X,y-4,X+W,y-4);y+=8;return}
+      const head=i===0||(l===l.toUpperCase()&&/[A-Z]/.test(l)&&!l.includes(" : ")&&!l.includes(": "));
+      doc.setFont("courier",head?"bold":"normal");doc.setFontSize(i===0?13:9.5);
+      if(i===0){doc.setTextColor(176,68,26)}else doc.setTextColor(20,20,20);
+      doc.splitTextToSize(l||" ",W).forEach(s=>{if(y>800){doc.addPage();y=56}doc.text(s,X,y);y+=i===0?18:LH});
+    });
+    doc.setProperties({title:beoNo(b)});
+    downloadBlob(doc.output("blob"),`BEO ${bName(b).replace(/[\\/:*?"<>|]+/g," ")} ${b.eventDate||""}.pdf`.replace(/\s+/g," ").trim());toast("BEO PDF terdownload");
+  }catch(e){console.error(e);toast("Gagal membuat PDF: "+e.message)}
+};
+
+/* ================= HISTORY ================= */
+const FIELD_LABEL={company:"Perusahaan",customer:"Nama customer",pic:"PIC",phone:"Telp",email:"Email",event_date:"Tanggal event",start_time:"Jam mulai",end_time:"Jam selesai",pax:"Jumlah pax",area:"Area",event_name:"Jenis acara",setup:"Setup",status:"Status",
+  dp_needed:"Perlu DP",dp_amount:"Nominal DP",dp_date:"Tanggal DP",dp_received:"DP diterima",dp_link:"Link bukti DP",dp_proof_path:"File bukti DP",menu_type:"Tipe menu",items:"Daftar menu",alacarte:"Menu à la carte",price_per_pax:"Harga per pax",
+  with_service:"Service charge",with_tax:"Pajak",special:"Special request",notes:"Notes",cancelled_at:"Pembatalan",cancel_reason:"Alasan batal"};
+function histVal(k,v){
+  if(v===null||v===undefined||v==="")return"kosong";
+  if(typeof v==="boolean")return v?"Ya":"Tidak";
+  if(k==="status")return STATUS[v]?.label||v;
+  if(k==="price_per_pax"||k==="dp_amount")return rp(v)||"Rp 0";
+  if(k==="event_date"||k==="dp_date")return shortDate(v);
+  if(k==="cancelled_at")return"dibatalkan";
+  if(Array.isArray(v))return v.filter(i=>i&&i.name).map(i=>i.name+(i.qty?` (${i.qty})`:"")).join(", ")||"kosong";
+  const s=String(v);return s.length>80?s.slice(0,80)+"…":s;
+}
+async function showHistory(b){
+  const sec=$("#hist-sec");
+  if(!b||!can.history()){sec.hidden=true;return}
+  sec.hidden=false;$("#hist-list").innerHTML=`<p class="hint">Memuat riwayat…</p>`;
+  const {data,error}=await sb.from("booking_history").select("*").eq("booking_id",b.id).order("changed_at",{ascending:false}).limit(60);
+  if(editing?.id!==b.id)return;
+  if(error){$("#hist-list").innerHTML=`<p class="err">Gagal memuat riwayat.</p>`;return}
+  if(!data.length){$("#hist-list").innerHTML=`<p class="hint">Belum ada riwayat. Perubahan mulai dicatat sejak fitur ini aktif.</p>`;return}
+  $("#hist-list").innerHTML=data.map(h=>{
+    const when=new Date(h.changed_at).toLocaleString("id-ID",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+    let body;
+    if(h.action==="create")body="Membuat booking";
+    else if(h.action==="delete")body="Menghapus booking permanen";
+    else body=Object.entries(h.changes||{}).map(([k,[o,n]])=>{
+      if(k==="cancelled_at")return n?"<b>Membatalkan booking</b>":"<b>Memulihkan booking</b>";
+      return `<b>${FIELD_LABEL[k]||k}</b>: <s>${esc(histVal(k,o))}</s> → ${esc(histVal(k,n))}`}).join("<br>");
+    return `<div class="hi"><span class="hm">${when} · ${esc(personName(h.changed_by))}</span><span class="hc">${body}</span></div>`}).join("");
+}
+{const _of=openForm;openForm=function(b){_of(b);showHistory(b)}}
+
+/* ================= QUOTATION → BOOKING ================= */
+function quoteBookingRow(q){
+  const m=qModel(q),items=m.items,paxItem=items.find(i=>/^pax$/i.test(i.unit||"")&&String(i.qty).trim()!=="");
+  const others=items.filter(i=>i!==paxItem),isLump=i=>String(i.qty).trim()==="";
+  /* priced items (incl. flat-price ones as qty 1) keep their money in the booking; free flat items become setup notes */
+  const withQty=others.filter(i=>!isLump(i)||num(i.price)>0).map(i=>isLump(i)?{...i,qty:"1"}:i),lumps=others.filter(i=>isLump(i)&&!num(i.price));
+  const r={company:null,customer:q.billedTo,event_date:q.resDate||null,start_time:q.tStart||null,end_time:q.tEnd||null,status:"confirmed",
+    with_service:!!q.svc,with_tax:!!q.tax,dp_needed:m.dpP>0,dp_amount:m.dp,notes:(q.menu||"").trim()||null,setup:lumps.map(i=>i.desc).join(" + ")||null,total:m.total};
+  if(paxItem){Object.assign(r,{menu_type:"Prasmanan",pax:num(paxItem.qty),price_per_pax:num(paxItem.price),event_name:paxItem.desc,items:[],alacarte:withQty.map(i=>({name:i.desc,qty:String(i.qty),price:num(i.price)}))})}
+  else Object.assign(r,{menu_type:"Pre-Order",pax:0,price_per_pax:0,items:withQty.map(i=>({name:i.desc,qty:String(i.qty),price:num(i.price),note:""})),alacarte:[]});
+  return r;
+}
+function syncQuoteBookingBtn(){
+  const btn=$("#qe-tobooking");if(!btn||!qCur)return;
+  const linked=qCur.bookingId&&bookings.find(b=>b.id===qCur.bookingId);
+  btn.textContent=linked?"Buka booking":"Jadikan booking";btn.hidden=false;
+}
+{const _qo=qOpen;qOpen=function(q){_qo(q);syncQuoteBookingBtn()}}
+$("#qe-tobooking").onclick=async()=>{
+  const linked=qCur&&qCur.bookingId&&bookings.find(b=>b.id===qCur.bookingId);
+  if(linked){qClose();openForm(linked);return}
+  const q=qRead();
+  if(!q.resDate){showErr($("#qe-err"),"Isi tanggal reservasi dulu sebelum dijadikan booking.");$("#qe-resdate").focus();return}
+  const row=quoteBookingRow(q);
+  const probe={eventDate:row.event_date,startTime:row.start_time||"",endTime:row.end_time||"",area:"",company:"",customer:row.customer};
+  if(!await confirmConflicts(probe,null))return;
+  const saved=await qSave();if(!saved)return;
+  const {data,error}=await sb.from("bookings").insert(row).select().single();
+  if(error){showErr($("#qe-err"),"Gagal membuat booking: "+error.message);return}
+  await sb.from("quotations").update({booking_id:data.id}).eq("id",saved.id);
+  await loadBookings();
+  const nb=bookings.find(b=>b.id===data.id)||fromRow(data);
+  qClose();openForm(nb);toast("Booking dibuat dari quotation. Lengkapi telp, area & menu lalu simpan.");
+};
 
 $("#mode").textContent=longDate(today());
 boot();
