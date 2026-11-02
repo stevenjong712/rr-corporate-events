@@ -1487,7 +1487,7 @@ const MON_EN=["January","February","March","April","May","June","July","August",
 const enLong=s=>{const d=parseD(s);return d?`${d.getDate()} ${MON_EN[d.getMonth()]} ${d.getFullYear()}`:""};
 const enShort=s=>{const d=parseD(s);return d?`${d.getDate()} ${MON_EN[d.getMonth()].slice(0,3)} ${d.getFullYear()}`:""};
 const n0=v=>Number(v||0).toLocaleString("en-US");
-can.quote=()=>["master_admin","admin","sales"].includes(me?.role);
+can.quote=()=>["master_admin","admin","sales","finance"].includes(me?.role);
 
 let qCur=null, qList=[];
 function qBlank(){return{id:null,number:"",quoteDate:today(),billedTo:"",bookingId:null,resDate:"",venue:"Rusty Rabbit",tStart:"",tEnd:"",
@@ -2149,7 +2149,7 @@ function quoteBookingRow(q){
 function syncQuoteBookingBtn(){
   const btn=$("#qe-tobooking");if(!btn||!qCur)return;
   const linked=qCur.bookingId&&bookings.find(b=>b.id===qCur.bookingId);
-  btn.textContent=linked?"Buka booking":"Jadikan booking";btn.hidden=false;
+  btn.textContent=linked?"Buka booking":"Jadikan booking";btn.hidden=!linked&&!can.create();
 }
 {const _qo=qOpen;qOpen=function(q){_qo(q);syncQuoteBookingBtn()}}
 $("#qe-tobooking").onclick=async()=>{
